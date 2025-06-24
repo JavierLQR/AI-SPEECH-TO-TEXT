@@ -2,17 +2,13 @@ import { GoogleGenAI } from '@google/genai'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { CohereClientV2 } from 'cohere-ai'
-import { PrismaService } from 'nestjs-prisma'
 
 @Injectable()
 export class ChatService {
   private readonly ia: GoogleGenAI
   private readonly cohere: CohereClientV2
 
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly configService: ConfigService,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     this.ia = new GoogleGenAI({
       apiKey: this.configService.getOrThrow('GOOGLE_GENAI_API_KEY'),
     })
