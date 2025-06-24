@@ -7,6 +7,7 @@ import { IaLanchaingModule } from './ia-lanchaing/mistral/ia-lanchaing.module'
 import { SpeedToTextModule } from './speed-to-text/speed-to-text.module'
 import { DeepseekModule } from './ia-lanchaing/deepseek/deepseek.module'
 import { GroqCloudModule } from './groq-cloud/speech-to-text-and-text-to-speech/groq-cloud.module'
+import { AiQwenModule } from './ai-qwen/ai-qwen.module'
 @Module({
   imports: [
     ChatModule,
@@ -24,6 +25,7 @@ import { GroqCloudModule } from './groq-cloud/speech-to-text-and-text-to-speech/
     SpeedToTextModule,
     DeepseekModule,
     GroqCloudModule,
+    AiQwenModule,
   ],
   controllers: [],
   providers: [],
