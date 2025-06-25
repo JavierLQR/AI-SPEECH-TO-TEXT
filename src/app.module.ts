@@ -8,6 +8,7 @@ import { SpeedToTextModule } from './speed-to-text/speed-to-text.module'
 import { DeepseekModule } from './ia-lanchaing/deepseek/deepseek.module'
 import { GroqCloudModule } from './groq-cloud/speech-to-text-and-text-to-speech/groq-cloud.module'
 import { AiQwenModule } from './ai-qwen/ai-qwen.module'
+import { PineconeModule } from './pinecone/pinecone.module'
 @Module({
   imports: [
     ChatModule,
@@ -26,6 +27,7 @@ import { AiQwenModule } from './ai-qwen/ai-qwen.module'
     DeepseekModule,
     GroqCloudModule,
     AiQwenModule,
+    PineconeModule,
   ],
   controllers: [],
   providers: [],
