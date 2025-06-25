@@ -1,4 +1,4 @@
-import { MistralAIEmbeddings } from '@langchain/mistralai'
+import { ChatMistralAI, MistralAIEmbeddings } from '@langchain/mistralai'
 import {
   HttpStatus,
   Injectable,
@@ -11,22 +11,34 @@ import {
   QueryResponse,
   RecordMetadata,
 } from '@pinecone-database/pinecone'
+import { getPrompt } from './prompt'
+import { PrismaService } from 'nestjs-prisma'
 
 @Injectable()
 export class PineconeService {
   private readonly pinecone: Pinecone
   private readonly mistralEmbeddings: MistralAIEmbeddings
   private readonly logger: Logger = new Logger(PineconeService.name)
-
+  private readonly mistral: ChatMistralAI
   /**
    *
    * @param configService ConfigService to access environment variables
    * @description
    * This constructor injects the ConfigService, which is used to access environment variables.
    */
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
+  ) {
     this.pinecone = new Pinecone({
       apiKey: this.configService.getOrThrow<string>('PINECONE_API_KEY'),
+    })
+    this.mistral = new ChatMistralAI({
+      apiKey: this.configService.getOrThrow<string>('MISTRAL_API_KEY'),
+      model: this.configService.getOrThrow<string>('MISTRAL_MODEL'),
+      temperature: 0.2, // Optional, adjust as needed
+
+      maxTokens: 1000, // Optional, adjust as needed
     })
     this.mistralEmbeddings = new MistralAIEmbeddings({
       apiKey: this.configService.getOrThrow<string>('MISTRAL_API_KEY'),
@@ -429,6 +441,31 @@ export class PineconeService {
     } catch (error) {
       this.logger.error('Error querying Pinecone index:', error)
       throw new InternalServerErrorException('Failed to query Pinecone index')
+    }
+  }
+
+  async questionAI() {
+    const { queryResponse } = await this.queryIndex('Black holes')
+    const contextChunks = queryResponse.matches
+      .map((match) => {
+        const chunkText =
+          typeof match.metadata?.chunk_text === 'string'
+            ? match.metadata.chunk_text
+            : ''
+        return `- ${chunkText}`
+      })
+      .join('\n')
+    const systemPrompt = getPrompt(contextChunks)
+
+    const response = await this.mistral.invoke([
+      { role: 'system', content: systemPrompt, name: 'system' },
+      { role: 'user', content: 'Black holes', name: 'user' },
+    ])
+
+    return {
+      message: 'Respuesta generada exitosamente',
+      answer: response.content,
+      status: HttpStatus.OK,
     }
   }
 }
