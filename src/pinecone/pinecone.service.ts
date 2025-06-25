@@ -1,4 +1,6 @@
 import { ChatMistralAI, MistralAIEmbeddings } from '@langchain/mistralai'
+
+import { BaseMessageLike } from '@langchain/core/messages'
 import {
   HttpStatus,
   Injectable,
@@ -11,9 +13,8 @@ import {
   QueryResponse,
   RecordMetadata,
 } from '@pinecone-database/pinecone'
-import { getPrompt } from './prompt'
 import { PrismaService } from 'nestjs-prisma'
-
+import { getPrompt } from './prompt'
 @Injectable()
 export class PineconeService {
   private readonly pinecone: Pinecone
@@ -38,7 +39,7 @@ export class PineconeService {
       model: this.configService.getOrThrow<string>('MISTRAL_MODEL'),
       temperature: 0.2, // Optional, adjust as needed
 
-      maxTokens: 1000, // Optional, adjust as needed
+      maxTokens: 100, // Optional, adjust as needed
     })
     this.mistralEmbeddings = new MistralAIEmbeddings({
       apiKey: this.configService.getOrThrow<string>('MISTRAL_API_KEY'),
@@ -444,8 +445,25 @@ export class PineconeService {
     }
   }
 
-  async questionAI() {
-    const { queryResponse } = await this.queryIndex('Black holes')
+  async questionAI(newMessage: string) {
+    // 1. Guardar el mensaje nuevo del usuario
+    await this.prismaService.chatMessage.create({
+      data: {
+        userId: '1',
+        role: 'user',
+        content: newMessage,
+      },
+    })
+
+    // 2. Obtener los últimos 10 mensajes del historial
+    const history = await this.prismaService.chatMessage.findMany({
+      where: { userId: '1' },
+      orderBy: { createdAt: 'asc' },
+      take: 10,
+    })
+
+    const { queryResponse } = await this.queryIndex(newMessage)
+
     const contextChunks = queryResponse.matches
       .map((match) => {
         const chunkText =
@@ -457,10 +475,25 @@ export class PineconeService {
       .join('\n')
     const systemPrompt = getPrompt(contextChunks)
 
-    const response = await this.mistral.invoke([
-      { role: 'system', content: systemPrompt, name: 'system' },
-      { role: 'user', content: 'Black holes', name: 'user' },
-    ])
+    // 4. Convertir historial a formato del modelo
+    const chatHistory: BaseMessageLike[] = [
+      { role: 'system', content: systemPrompt },
+      ...history.map((msg) => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+      })),
+    ]
+
+    const response = await this.mistral.invoke(chatHistory)
+
+    // 6. Guardar respuesta del asistente en la DB
+    await this.prismaService.chatMessage.create({
+      data: {
+        userId: '1',
+        role: 'assistant',
+        content: JSON.stringify(response.content),
+      },
+    })
 
     return {
       message: 'Respuesta generada exitosamente',
