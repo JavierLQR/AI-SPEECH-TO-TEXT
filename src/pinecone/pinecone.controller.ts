@@ -22,6 +22,8 @@ export class PineconeController {
 
   @Get('question-AI')
   questionAI() {
-    return this.pineconeService.questionAI()
+    return this.pineconeService.questionAI(
+      'Quien fue el creador de la teoria de la relatividad general?',
+    )
   }
 }
