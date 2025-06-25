@@ -19,4 +19,9 @@ export class PineconeController {
   queryIndex() {
     return this.pineconeService.queryIndex('Black holes')
   }
+
+  @Get('question-AI')
+  questionAI() {
+    return this.pineconeService.questionAI()
+  }
 }
