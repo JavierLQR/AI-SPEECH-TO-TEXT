@@ -10,6 +10,7 @@ import { GroqCloudModule } from './groq-cloud/speech-to-text-and-text-to-speech/
 import { AiQwenModule } from './ai-qwen/ai-qwen.module'
 import { PineconeModule } from './pinecone/pinecone.module'
 import { MitralVisionModule } from './mitral-vision/mitral-vision.module'
+import { GeminiSpeechModule } from './gemini-speech/gemini-speech.module'
 @Module({
   imports: [
     ChatModule,
@@ -30,6 +31,7 @@ import { MitralVisionModule } from './mitral-vision/mitral-vision.module'
     AiQwenModule,
     PineconeModule,
     MitralVisionModule,
+    GeminiSpeechModule,
   ],
   controllers: [],
   providers: [],
