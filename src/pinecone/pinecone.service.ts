@@ -39,7 +39,7 @@ export class PineconeService {
       model: this.configService.getOrThrow<string>('MISTRAL_MODEL'),
       temperature: 0.2, // Optional, adjust as needed
 
-      maxTokens: 100, // Optional, adjust as needed
+      maxTokens: 300, // Optional, adjust as needed
     })
     this.mistralEmbeddings = new MistralAIEmbeddings({
       apiKey: this.configService.getOrThrow<string>('MISTRAL_API_KEY'),
@@ -459,10 +459,14 @@ export class PineconeService {
     const history = await this.prismaService.chatMessage.findMany({
       where: { userId: '1' },
       orderBy: { createdAt: 'asc' },
-      take: 10,
+      take: 5,
     })
 
+    this.logger.debug(`History: ${JSON.stringify(history)}`)
+
     const { queryResponse } = await this.queryIndex(newMessage)
+
+    this.logger.debug(`QueryResponse: ${JSON.stringify(queryResponse)}`)
 
     const contextChunks = queryResponse.matches
       .map((match) => {
