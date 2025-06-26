@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, Query } from '@nestjs/common'
 import { PineconeService } from './pinecone.service'
 
 @Controller('pinecone')
@@ -21,9 +21,11 @@ export class PineconeController {
   }
 
   @Get('question-AI')
-  questionAI() {
-    return this.pineconeService.questionAI(
-      'Quien fue el creador de la teoria de la relatividad general?',
-    )
+  questionAI(@Query('question') question: string) {
+    console.log({
+      question,
+    })
+
+    return this.pineconeService.questionAI(question)
   }
 }
