@@ -11,6 +11,7 @@ import { AiQwenModule } from './ai-qwen/ai-qwen.module'
 import { PineconeModule } from './pinecone/pinecone.module'
 import { MitralVisionModule } from './mitral-vision/mitral-vision.module'
 import { GeminiSpeechModule } from './gemini-speech/gemini-speech.module'
+import { EmbeddingsProductsModule } from './embeddings-products/embeddings-products.module'
 @Module({
   imports: [
     ChatModule,
@@ -32,6 +33,7 @@ import { GeminiSpeechModule } from './gemini-speech/gemini-speech.module'
     PineconeModule,
     MitralVisionModule,
     GeminiSpeechModule,
+    EmbeddingsProductsModule,
   ],
   controllers: [],
   providers: [],
