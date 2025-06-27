@@ -23,6 +23,7 @@
     "@google/genai": "^1.5.1",
     "@langchain/core": "^0.3.61",
     "@langchain/mistralai": "^0.2.1",
+    "@langchain/pinecone": "^0.2.0",
     "@mistralai/mistralai": "^1.7.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
