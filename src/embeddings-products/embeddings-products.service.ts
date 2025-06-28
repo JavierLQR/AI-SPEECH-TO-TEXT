@@ -81,6 +81,7 @@ export class EmbeddingsProductsService {
       vector: queryVector,
       topK: 5,
       includeMetadata: true,
+      filter: {},
     })
 
     // 3. Construir el contexto desde los productos
@@ -117,15 +118,18 @@ export class EmbeddingsProductsService {
   public async createEmbeddings() {
     const products = await this.findAllProducts()
     this.logger.log('Iniciando vectorización de productos...')
-    const docs: Document[] = products.map((product) => ({
-      pageContent: `${product.product}. ${product.category}`,
-      metadata: {
-        id: product.id,
-        name: product.product,
-        price: product.price,
-      },
-      id: product.id,
-    }))
+
+    const docs: Document[] = products.map(
+      ({ category, id, price, product, size }) => ({
+        pageContent: `${product}. ${category}`,
+        metadata: {
+          id,
+          product,
+          price,
+          size,
+        },
+      }),
+    )
     const vectorStore = await PineconeStore.fromDocuments(
       docs,
       this.embeddings,
