@@ -48,6 +48,10 @@ export class LanchaingMemoryPostgresService {
       inputMessagesKey: 'input',
       historyMessagesKey: 'chat_history',
       getMessageHistory: (sessionId: string) => {
+        console.log({
+          sessionId,
+        })
+
         return new PostgresChatMessageHistory({
           sessionId,
           pool: this.pool,
