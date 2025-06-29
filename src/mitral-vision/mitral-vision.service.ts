@@ -4,6 +4,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 @Injectable()
 export class MitralVisionService {
   private readonly logger: Logger = new Logger(MitralVisionService.name)
+
   constructor(@Inject(Mistral.name) private readonly mistral: Mistral) {
     this.logger.verbose('MistralVisionService initialized')
   }
