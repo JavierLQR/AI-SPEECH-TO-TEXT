@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 
 @Injectable()
-export class DeepseekService {}
+export class DeepseekService {
+  private readonly logger = new Logger(DeepseekService.name)
+}
