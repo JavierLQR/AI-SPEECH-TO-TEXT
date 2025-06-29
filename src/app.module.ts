@@ -12,6 +12,8 @@ import { PineconeModule } from './pinecone/pinecone.module'
 import { MitralVisionModule } from './mitral-vision/mitral-vision.module'
 import { GeminiSpeechModule } from './gemini-speech/gemini-speech.module'
 import { EmbeddingsProductsModule } from './embeddings-products/embeddings-products.module'
+import { LanchaingHistoryMemoryModule } from './lanchaing-history-memory/lanchaing-history-memory.module'
+import { LanchaingMemoryPostgresModule } from './lanchaing-memory-postgres/lanchaing-memory-postgres.module'
 @Module({
   imports: [
     ChatModule,
@@ -34,6 +36,8 @@ import { EmbeddingsProductsModule } from './embeddings-products/embeddings-produ
     MitralVisionModule,
     GeminiSpeechModule,
     EmbeddingsProductsModule,
+    LanchaingHistoryMemoryModule,
+    LanchaingMemoryPostgresModule,
   ],
   controllers: [],
   providers: [],
