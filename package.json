@@ -21,9 +21,11 @@
   },
   "dependencies": {
     "@google/genai": "^1.5.1",
+    "@langchain/community": "^0.3.47",
     "@langchain/core": "^0.3.61",
     "@langchain/mistralai": "^0.2.1",
     "@langchain/pinecone": "^0.2.0",
+    "@langchain/redis": "^0.1.1",
     "@mistralai/mistralai": "^1.7.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
