@@ -11,7 +11,9 @@ export class MitralVisionService {
 
   /**
    *
-   * @returns
+   * @description This method sends a text prompt to the chat model and returns the response.
+   * @see https://github.com/mistralai/mistralai
+   * @returns The response from the chat model.
    */
   public async describeImage() {
     const chatResponse = await this.mistral.chat.complete({
