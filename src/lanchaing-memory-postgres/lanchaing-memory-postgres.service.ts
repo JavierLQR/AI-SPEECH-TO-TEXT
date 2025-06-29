@@ -7,13 +7,14 @@ import {
 import { RunnableWithMessageHistory } from '@langchain/core/runnables'
 import { ChatMistralAI } from '@langchain/mistralai'
 import { Injectable } from '@nestjs/common'
+import { PrismaService } from 'nestjs-prisma'
 import * as pg from 'pg'
 
 @Injectable()
 export class LanchaingMemoryPostgresService {
   private readonly pool: pg.Pool
   private readonly chainWithMemory: RunnableWithMessageHistory<any, any>
-  constructor() {
+  constructor(private readonly prismaService: PrismaService) {
     // Inicializa conexión a PostgreSQL desde .env
     this.pool = new pg.Pool({
       host: process.env.HOST,
@@ -32,10 +33,7 @@ export class LanchaingMemoryPostgresService {
     })
 
     const prompt = ChatPromptTemplate.fromMessages([
-      [
-        'system',
-        'Eres un asistente inteligente que recuerda a los usuarios por su nombre y contexto anterior.',
-      ],
+      ['system', 'You are a helpful assistant.'],
       new MessagesPlaceholder('chat_history'),
       ['human', '{input}'],
     ])
@@ -77,5 +75,18 @@ export class LanchaingMemoryPostgresService {
     return {
       answer: result,
     }
+  }
+
+  async findAllConversations() {
+    return await this.prismaService.langchain_chat_histories.findMany({
+      orderBy: {
+        id: 'desc',
+      },
+      select: {
+        id: true,
+        session_id: true,
+        message: true,
+      },
+    })
   }
 }

@@ -11,4 +11,9 @@ export class LanchaingMemoryPostgresController {
   conversation(@Query('message') message: string) {
     return this.lanchaingMemoryPostgresService.conversation(message)
   }
+
+  @Get('conversations')
+  conversation2() {
+    return this.lanchaingMemoryPostgresService.findAllConversations()
+  }
 }
