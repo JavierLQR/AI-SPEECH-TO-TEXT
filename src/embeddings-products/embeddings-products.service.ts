@@ -81,7 +81,6 @@ export class EmbeddingsProductsService {
       vector: queryVector,
       topK: 5,
       includeMetadata: true,
-      filter: {},
     })
 
     // 3. Construir el contexto desde los productos
@@ -138,6 +137,7 @@ export class EmbeddingsProductsService {
         namespace: 'ns-products',
       },
     )
+
     this.logger.debug({
       message: 'Productos vectorizados e insertados exitosamente',
       vectorStore,
