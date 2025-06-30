@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common'
-import { ChatModule } from './chat/chat.module'
-import { PrismaModule } from 'nestjs-prisma'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { IaMistralModule } from './ia-mistral/ia-mistral.module'
-import { IaLanchaingModule } from './ia-lanchaing/mistral/ia-lanchaing.module'
-import { SpeedToTextModule } from './speed-to-text/speed-to-text.module'
-import { DeepseekModule } from './ia-lanchaing/deepseek/deepseek.module'
-import { GroqCloudModule } from './groq-cloud/speech-to-text-and-text-to-speech/groq-cloud.module'
+import { PrismaModule } from 'nestjs-prisma'
 import { AiQwenModule } from './ai-qwen/ai-qwen.module'
-import { PineconeModule } from './pinecone/pinecone.module'
-import { MitralVisionModule } from './mitral-vision/mitral-vision.module'
-import { GeminiSpeechModule } from './gemini-speech/gemini-speech.module'
+import { ChatModule } from './chat/chat.module'
 import { EmbeddingsProductsModule } from './embeddings-products/embeddings-products.module'
+import { GeminiSpeechModule } from './gemini-speech/gemini-speech.module'
+import { GroqCloudModule } from './groq-cloud/speech-to-text-and-text-to-speech/groq-cloud.module'
+import { DeepseekModule } from './ia-lanchaing/deepseek/deepseek.module'
+import { IaLanchaingModule } from './ia-lanchaing/mistral/ia-lanchaing.module'
+import { IaMistralModule } from './ia-mistral/ia-mistral.module'
 import { LanchaingHistoryMemoryModule } from './lanchaing-history-memory/lanchaing-history-memory.module'
 import { LanchaingMemoryPostgresModule } from './lanchaing-memory-postgres/lanchaing-memory-postgres.module'
+import { MitralVisionModule } from './mitral-vision/mitral-vision.module'
+import { PineconeModule } from './pinecone/pinecone.module'
+import { SpeedToTextModule } from './speed-to-text/speed-to-text.module'
 
 import { RedisModule } from '@nestjs-modules/ioredis'
 @Module({
@@ -53,6 +53,5 @@ import { RedisModule } from '@nestjs-modules/ioredis'
     LanchaingMemoryPostgresModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}
