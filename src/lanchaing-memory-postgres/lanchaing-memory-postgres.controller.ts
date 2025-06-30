@@ -16,4 +16,9 @@ export class LanchaingMemoryPostgresController {
   conversation2() {
     return this.lanchaingMemoryPostgresService.findAllConversations()
   }
+
+  @Get('embeddings')
+  getEmbbedings(@Query('text') text: string) {
+    return this.lanchaingMemoryPostgresService.getEmbbedings(text)
+  }
 }
