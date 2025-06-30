@@ -123,6 +123,7 @@ export class EmbeddingsProductsService {
         pageContent: `${product}. ${category}`,
         metadata: {
           id,
+          category,
           product,
           price,
           size,
