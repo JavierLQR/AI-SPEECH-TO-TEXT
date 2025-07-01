@@ -36,3 +36,26 @@ model langchain_chat_histories {
   session_id String @db.VarChar(255)
   message    Json
 }
+
+model Interview {
+  id            String @id @default(cuid())
+  candidateName String
+  position      String
+  score         Int
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@index([candidateName])
+  @@index([position])
+}
+
+model ProductIndex {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  description String
+  price       Float
+  imageUrl    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
