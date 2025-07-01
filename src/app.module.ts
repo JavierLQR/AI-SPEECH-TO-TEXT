@@ -16,6 +16,7 @@ import { PineconeModule } from './pinecone/pinecone.module'
 import { SpeedToTextModule } from './speed-to-text/speed-to-text.module'
 
 import { RedisModule } from '@nestjs-modules/ioredis'
+import { PineconeProductsQuerysModule } from './pinecone-products-querys/pinecone-products-querys.module'
 @Module({
   imports: [
     RedisModule.forRootAsync({
@@ -51,6 +52,7 @@ import { RedisModule } from '@nestjs-modules/ioredis'
     EmbeddingsProductsModule,
     LanchaingHistoryMemoryModule,
     LanchaingMemoryPostgresModule,
+    PineconeProductsQuerysModule,
   ],
   controllers: [],
 })
