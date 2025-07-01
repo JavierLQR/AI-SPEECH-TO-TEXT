@@ -112,7 +112,7 @@ export class LanchaingMemoryPostgresService {
       .namespace('ns-products')
 
     // solo es cambiar el vector soy burro xdxd
-    const vector = await this.mistralEmbeddings.embedQuery('calzados')
+    const vector = await this.mistralEmbeddings.embedQuery(text)
 
     const response = await index.query({
       vector,
