@@ -2,16 +2,26 @@ import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from 'nestjs-prisma'
 import { ConfigService } from '@nestjs/config'
 
+import { ChatCohere } from '@langchain/cohere'
 import { CohereEmbeddings } from '@langchain/cohere'
 import { Pinecone as PineconeClient } from '@pinecone-database/pinecone'
 import { PineconeStore } from '@langchain/pinecone'
 import { Document } from '@langchain/core/documents'
+import {
+  ChatPromptTemplate,
+  HumanMessagePromptTemplate,
+  SystemMessagePromptTemplate,
+} from '@langchain/core/prompts'
+
+import Redis from 'ioredis'
+import { InjectRedis } from '@nestjs-modules/ioredis'
 
 @Injectable()
 export class PineconeProductsQuerysService {
   private readonly embeddings: CohereEmbeddings
   private readonly pinecone: PineconeClient
   private readonly nameIndex: string = 'products-querys'
+  private readonly model: ChatCohere
 
   private readonly logger: Logger = new Logger(
     PineconeProductsQuerysService.name,
@@ -20,10 +30,27 @@ export class PineconeProductsQuerysService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
+    @InjectRedis() private readonly redis: Redis,
   ) {
     this.embeddings = new CohereEmbeddings({
       apiKey: this.configService.getOrThrow<string>('COHERE_API_KEY'),
       model: this.configService.getOrThrow<string>('COHERE_MODEL_EMBED'),
+    })
+
+    this.model = new ChatCohere({
+      apiKey: this.configService.getOrThrow<string>('COHERE_API_KEY'),
+      temperature: 0.1,
+      model: 'command-a-03-2025',
+
+      metadata: {
+        model: 'command-a-03-2025',
+        name: this.configService.getOrThrow<string>('COHERE_MODEL_EMBED'),
+        owner: this.configService.getOrThrow<string>('COHERE_MODEL_EMBED'),
+      },
+    })
+
+    this.model.withConfig({
+      maxTokens: 100,
     })
 
     this.pinecone = new PineconeClient({
@@ -100,15 +127,40 @@ export class PineconeProductsQuerysService {
 
     const dataVector = await index.query({
       vector,
-      topK: 5,
+      topK: 3,
       includeMetadata: true,
     })
 
-    this.logger.debug(dataVector)
+    const context = dataVector.matches
+      .map(({ metadata }) => {
+        const { name, price, description, imageUrl, id } = metadata as {
+          name: string
+          price: string
+          description: string
+          imageUrl: string
+          id: string
+        }
+        return `Producto: ${name}\nDescripción: ${description}\nPrecio: ${price}\nImagen: ${imageUrl}\nID: ${id}`
+      })
+      .join('\n')
+
+    const promptTest = ChatPromptTemplate.fromMessages([
+      SystemMessagePromptTemplate.fromTemplate(
+        `   Eres un asistente experto en productos.
+    Aquí tienes una lista de productos encontrados relacionados con lo que el usuario preguntó:
+    ${context}
+    Con esta información, responde de forma clara, útil y sin mencionar que fue generada por IA.`,
+      ),
+      HumanMessagePromptTemplate.fromTemplate('{input}'),
+    ])
+
+    const chain = promptTest.pipe(this.model)
+
+    const response = await chain.invoke({ input: text })
 
     return {
+      content: response.content,
       message: 'Pinecone index queried successfully',
-      dataVector: dataVector.matches.map(({ metadata }) => metadata),
     }
   }
 
