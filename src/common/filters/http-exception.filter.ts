@@ -4,19 +4,24 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { ErrorResponse } from 'src/common/helpers/api-response-error'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger: Logger = new Logger(HttpExceptionFilter.name)
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const request = ctx.getRequest<Request>()
     const response = ctx.getResponse<Response>()
 
     const isHttpException = exception instanceof HttpException
-
+    this.logger.error({
+      exception,
+      exceptionResponse: isHttpException,
+    })
     const status = isHttpException
       ? exception.getStatus()
       : HttpStatus.INTERNAL_SERVER_ERROR
