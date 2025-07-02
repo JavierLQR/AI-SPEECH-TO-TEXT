@@ -17,6 +17,7 @@ import { SpeedToTextModule } from './speed-to-text/speed-to-text.module'
 
 import { RedisModule } from '@nestjs-modules/ioredis'
 import { PineconeProductsQuerysModule } from './pinecone-products-querys/pinecone-products-querys.module'
+import { FireworksAiModule } from './fireworks-ai/fireworks-ai.module'
 @Module({
   imports: [
     RedisModule.forRootAsync({
@@ -53,6 +54,7 @@ import { PineconeProductsQuerysModule } from './pinecone-products-querys/pinecon
     LanchaingHistoryMemoryModule,
     LanchaingMemoryPostgresModule,
     PineconeProductsQuerysModule,
+    FireworksAiModule,
   ],
   controllers: [],
 })
