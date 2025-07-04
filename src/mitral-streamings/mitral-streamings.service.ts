@@ -7,7 +7,6 @@ import { Runnable } from '@langchain/core/runnables'
 import { ChatMistralAI } from '@langchain/mistralai'
 import { MistralAIEmbeddings } from '@langchain/mistralai'
 
-// import { PineconeStore } from '@langchain/pinecone'
 import { Pinecone as PineconeClient } from '@pinecone-database/pinecone'
 
 @Injectable()
@@ -56,7 +55,9 @@ export class MitralStreamingsService {
     const vectorAnswer = await index.query({
       topK: 2,
       includeMetadata: true,
-      vector: await this.mistralAIEmbeddings.embedQuery('Tienes laptops?'),
+      vector: await this.mistralAIEmbeddings.embedQuery(
+        'Que productos tienes?',
+      ),
     })
 
     const context = vectorAnswer.matches
@@ -66,34 +67,19 @@ export class MitralStreamingsService {
       )
       .join('\n')
 
+    console.log({
+      context,
+    })
+
     const streams = await this.chain.stream({
       context: context,
-      question: 'Tienes laptops?',
+      question: 'Que productos tienes?',
     })
 
     for await (const chunk of streams) {
       console.log(chunk)
     }
-
-    // const vectorStore = await PineconeStore.fromExistingIndex(
-    //   this.mistralAIEmbeddings,
-    //   {
-    //     namespace: 'dev',
-    //     pineconeIndex: index,
-    //   },
-    // )
-
     return {}
-    // const contextDB = await vectorStore.similaritySearch('Tienes laptops?', 2)
-
-    // const streams = await this.chain.stream({
-    //   context: contextDB,
-    //   question: 'Tienes laptops?',
-    // })
-
-    // for await (const chunk of streams) {
-    //   console.log(chunk)
-    // }
   }
 
   public async getPrompt(text: string) {
