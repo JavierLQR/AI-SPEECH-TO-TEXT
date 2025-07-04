@@ -153,7 +153,6 @@ export class LanchaingMemoryPostgresService {
         console.log({
           sessionId,
         })
-
         return new PostgresChatMessageHistory({
           sessionId,
           pool: this.pool,
