@@ -39,9 +39,12 @@ export class MitralStreamingsService {
       maxTokens: 300,
     })
 
-    const prompt = ChatPromptTemplate.fromTemplate(
-      'Eres un asiste de productos, aqui tienes una lista de productos: {context}\n\nPregunta: {question}\nRespuesta:',
-    )
+    const prompt = ChatPromptTemplate.fromTemplate(`
+      Basado en el siguiente producto, recomienda 3 productos similares o complementarios:
+      Producto: {product}
+      Recomendaciones:
+    `)
+
     const parsed = new StringOutputParser()
     this.chain = prompt.pipe(this.model).pipe(parsed)
   }
