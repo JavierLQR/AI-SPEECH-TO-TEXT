@@ -21,6 +21,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     this.logger.error({
       exception,
       exceptionResponse: isHttpException,
+      typeError: typeof exception,
     })
     const status = isHttpException
       ? exception.getStatus()
