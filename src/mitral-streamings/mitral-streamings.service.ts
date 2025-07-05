@@ -4,8 +4,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
 import { Runnable } from '@langchain/core/runnables'
-import { ChatMistralAI } from '@langchain/mistralai'
-import { MistralAIEmbeddings } from '@langchain/mistralai'
+import { ChatMistralAI, MistralAIEmbeddings } from '@langchain/mistralai'
 
 import { Pinecone as PineconeClient } from '@pinecone-database/pinecone'
 
@@ -23,20 +22,16 @@ export class MitralStreamingsService {
   private readonly mistralAIEmbeddings: MistralAIEmbeddings
 
   constructor(private readonly configService: ConfigService) {
-    this.pinecone = new PineconeClient({
-      apiKey: this.configService.getOrThrow<string>('PINECONE_API_KEY'),
-    })
-
-    this.mistralAIEmbeddings = new MistralAIEmbeddings({
-      apiKey: this.configService.getOrThrow<string>('MISTRAL_API_KEY'),
-      model: this.configService.getOrThrow<string>('MISTRAL_EMBEDDINGS_MODEL'),
-    })
-
     this.model = new ChatMistralAI({
       apiKey: this.configService.getOrThrow<string>('MISTRAL_API_KEY'),
       model: this.configService.getOrThrow<string>('MISTRAL_MODEL'),
       temperature: 0.1,
       maxTokens: 300,
+    })
+
+    this.mistralAIEmbeddings = new MistralAIEmbeddings({
+      apiKey: this.configService.getOrThrow<string>('MISTRAL_API_KEY'),
+      model: this.configService.getOrThrow<string>('MISTRAL_EMBEDDINGS_MODEL'),
     })
 
     const prompt = ChatPromptTemplate.fromTemplate(
