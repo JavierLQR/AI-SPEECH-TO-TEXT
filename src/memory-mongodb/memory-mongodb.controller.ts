@@ -14,8 +14,14 @@ export class MemoryMongodbController {
   ) {
     return this.memoryMongodbService.chatWithMongoDB(question, sessionId)
   }
+
   @Get('/pinecone-chat')
   async getUsePinecone(@Query('text') text: string) {
     return this.memoryMongodbService.getUsePinecone(text)
+  }
+
+  @Get('/chat-push')
+  chatPush() {
+    return this.memoryMongodbService.chatPush()
   }
 }
