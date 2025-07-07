@@ -123,10 +123,19 @@ export class MemoryMongodbService {
     this.logger.debug({
       response,
     })
-
+    let fullChunks: string = ''
     for await (const text of response) {
-      console.log({ text })
+      const isString = typeof text === 'string'
+
+      if (!isString) continue
+
+      fullChunks += text
+
+      await this.pusher.trigger('my-channel', 'my-event', {
+        message: text,
+      })
     }
+    console.log({ fullChunks })
 
     return {}
   }
