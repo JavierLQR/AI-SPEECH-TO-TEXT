@@ -154,7 +154,7 @@ export class MemoryMongodbService {
   /**
    * saveContextMemory
    */
-  public async saveContextMemory(
+  private async saveContextMemory(
     question: string,
     sessionId: string,
     response: string,
