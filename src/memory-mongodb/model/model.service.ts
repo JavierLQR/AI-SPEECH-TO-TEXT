@@ -1,17 +1,16 @@
 import { ChatMistralAI } from '@langchain/mistralai'
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
-import { MongoDBChatMessageHistory } from '@langchain/mongodb'
-import { MongoClient } from 'mongodb'
-import { BufferMemory, MemoryVariables } from 'langchain/memory'
-import { ParamsFromFString } from '@langchain/core/prompts'
+import { ChatPromptTemplate, ParamsFromFString } from '@langchain/core/prompts'
 import { Runnable } from '@langchain/core/runnables'
+import { MongoDBChatMessageHistory } from '@langchain/mongodb'
+import { BufferMemory, MemoryVariables } from 'langchain/memory'
+import { MongoClient } from 'mongodb'
 
-import { GetParsed, GetPrompt } from '../prompts/get.prompt'
+import { StringOutputParser } from '@langchain/core/output_parsers'
 @Injectable()
 export class GetModelService {
-  private readonly logger = new Logger(GetModelService.name)
   private readonly model: ChatMistralAI
 
   /**
@@ -28,6 +27,8 @@ export class GetModelService {
       model: this.configService.getOrThrow<string>('MISTRAL_MODEL'),
       temperature: 0.1,
       maxTokens: 300,
+      streaming: true, // very important to use streaming
+      callbacks: [],
       metadata: {
         model: this.configService.getOrThrow<string>('MISTRAL_MODEL'),
         name: this.configService.getOrThrow<string>('MISTRAL_MODEL'),
@@ -40,8 +41,8 @@ export class GetModelService {
    * @returns Returns the model
    * @private
    */
-  private getModel() {
-    this.logger.log('Modelo cargado')
+  public getModel() {
+    if (!this.model) throw new BadRequestException("Model doesn't exist")
     return this.model
   }
 
@@ -51,7 +52,20 @@ export class GetModelService {
    * @private
    */
   private getPrompt() {
-    return GetPrompt()
+    return ChatPromptTemplate.fromTemplate(`
+      A continuación tienes el historial de la conversación entre el usuario y el asistente de productos. Usa este historial para responder correctamente
+      
+      Historial:
+      {chat_history}
+      
+      Usuario: {question}
+      Asistente:
+
+    `)
+  }
+
+  public getParsed(): StringOutputParser {
+    return new StringOutputParser()
   }
 
   /**
@@ -61,7 +75,7 @@ export class GetModelService {
    * @returns Promise<MemoryVariables>
    * @private
    */
-  async getHistorialMemory(
+  public async getHistorialMemory(
     question: string,
     sessionId: string,
   ): Promise<MemoryVariables> {
@@ -103,7 +117,7 @@ export class GetModelService {
    * @param response Param response
    * @private
    */
-  async saveContextMemory(
+  public async saveContextMemory(
     question: string,
     sessionId: string,
     response: string,
@@ -124,8 +138,7 @@ export class GetModelService {
    * @returns Runnable<ParamsFromFString<string>>
    * */
 
-  getChainModel(): Runnable<ParamsFromFString<string>> {
-    this.logger.log('Chain model loaded')
-    return this.getPrompt().pipe(this.getModel()).pipe(GetParsed())
+  public getChainModel(): Runnable<ParamsFromFString<string>> {
+    return this.getPrompt().pipe(this.getModel()).pipe(this.getParsed())
   }
 }
