@@ -14,6 +14,8 @@ import { CohereEmbeddings } from '@langchain/cohere'
 import { DocumentInterface } from '@langchain/core/documents'
 
 import * as Pusher from 'pusher'
+import { IterableReadableStream } from '@langchain/core/dist/utils/stream'
+import { AIMessageChunk } from '@langchain/core/messages'
 
 @Injectable()
 export class MemoryMongodbService {
@@ -57,9 +59,7 @@ export class MemoryMongodbService {
       \n
       Usuario: {question}`,
     )
-    this.chainWithProducts = prompt
-      .pipe(this.getModelService.getModel())
-      .pipe(this.getModelService.getParsed())
+    this.chainWithProducts = prompt.pipe(this.getModelService.getModel())
 
     // PINECONE
     this.pinecone = new PineconeClient({
@@ -120,20 +120,20 @@ export class MemoryMongodbService {
       question: text,
     })
 
-    this.logger.debug({
-      response,
-    })
+    // this.logger.debug({
+    //   response,
+    //   text,
+    // })
     let fullChunks: string = ''
-    for await (const text of response) {
-      const isString = typeof text === 'string'
+    for await (const text of response as IterableReadableStream<AIMessageChunk>) {
+      // ya esta probar con redis y pusher
+      console.log({ text: text.content })
 
-      if (!isString) continue
-
-      fullChunks += text
-
-      await this.pusher.trigger('my-channel', 'my-event', {
-        message: text,
-      })
+      // if (!isString) continue
+      // fullChunks += text
+      // await this.pusher.trigger('my-channel', 'my-event', {
+      //   message: text,
+      // })
     }
     console.log({ fullChunks })
 
