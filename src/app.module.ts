@@ -20,6 +20,7 @@ import { PineconeProductsQuerysModule } from './pinecone-products-querys/pinecon
 import { FireworksAiModule } from './fireworks-ai/fireworks-ai.module'
 import { MitralStreamingsModule } from './mitral-streamings/mitral-streamings.module'
 import { MemoryMongodbModule } from './memory-mongodb/memory-mongodb.module'
+import { AppHistoryModule } from './app-history/app-history.module'
 @Module({
   imports: [
     RedisModule.forRootAsync({
@@ -59,6 +60,7 @@ import { MemoryMongodbModule } from './memory-mongodb/memory-mongodb.module'
     FireworksAiModule,
     MitralStreamingsModule,
     MemoryMongodbModule,
+    AppHistoryModule,
   ],
   controllers: [],
 })
