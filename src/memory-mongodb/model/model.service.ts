@@ -1,14 +1,14 @@
-import { ChatMistralAI } from '@langchain/mistralai'
 import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
+import { ChatMistralAI } from '@langchain/mistralai'
 import { ChatPromptTemplate, ParamsFromFString } from '@langchain/core/prompts'
 import { Runnable } from '@langchain/core/runnables'
 import { MongoDBChatMessageHistory } from '@langchain/mongodb'
 import { BufferMemory, MemoryVariables } from 'langchain/memory'
 import { MongoClient } from 'mongodb'
-
 import { StringOutputParser } from '@langchain/core/output_parsers'
+
 @Injectable()
 export class GetModelService {
   private readonly model: ChatMistralAI
