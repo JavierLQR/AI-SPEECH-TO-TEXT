@@ -8,7 +8,8 @@ import { coherePrompt } from './cohere-prompt'
 import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { RunnableWithMessageHistory } from '@langchain/core/runnables'
 import { MongoDBChatMessageHistory } from '@langchain/mongodb'
-import { Collection } from 'mongodb'
+import { MongoHistoryChatService } from '../mongo-history-chat/mongo-history-chat.service'
+import { Collection, ObjectId } from 'mongodb'
 
 @Injectable()
 export class CohereModelEmbedService {
@@ -18,7 +19,10 @@ export class CohereModelEmbedService {
 
   private readonly logger: Logger = new Logger(CohereModelEmbedService.name)
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly mongodbService: MongoHistoryChatService,
+  ) {
     this.model = new ChatCohere({
       apiKey: this.configService.getOrThrow<string>('COHERE_API_KEY'),
       model: this.configService.getOrThrow<string>('COHERE_MODEL_CHAT'),
@@ -48,8 +52,7 @@ export class CohereModelEmbedService {
     })
 
     this.model.withConfig({
-      // a la siguiente reducir, ya que el maximo es 10000 en cohere
-      maxTokens: 1000,
+      maxTokens: 300,
     })
 
     const parsed = new StringOutputParser()
@@ -62,21 +65,26 @@ export class CohereModelEmbedService {
    * @param collection - Colección de MongoDB
    * @param sessionId - ID único por usuario o conversación
    */
-  public withMemory(collection: Collection, sessionId: string) {
+  public withMemory(sessionId?: string) {
+    const chatId = sessionId || new ObjectId().toString()
     return new RunnableWithMessageHistory({
       runnable: this.chain,
       getMessageHistory: () =>
         new MongoDBChatMessageHistory({
-          sessionId,
-          collection,
+          sessionId: chatId,
+          collection: this.mongodbService.Colletion,
         }),
-      inputMessagesKey: 'input',
+      inputMessagesKey: 'question',
       historyMessagesKey: 'chat_history',
       outputMessagesKey: 'output',
       config: {
         maxConcurrency: 2,
       },
     })
+  }
+
+  public get Collection(): Collection {
+    return this.mongodbService.Colletion
   }
 
   /**
