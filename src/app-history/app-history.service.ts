@@ -5,6 +5,7 @@ import { PrismaService } from 'nestjs-prisma'
 
 import { CohereModelEmbedService } from './cohere-model-embed/cohere-model-embed.service'
 import { PineconeStore } from '@langchain/pinecone'
+// import { MongoDBChatMessageHistory } from '@langchain/mongodb'
 
 @Injectable()
 export class AppHistoryService {
@@ -76,33 +77,93 @@ export class AppHistoryService {
    * chatIndex
    */
   public async chatIndex(text: string) {
-    // este metodo hacerlo modular
-    const index = this.pineconeService.getPineconeStore(
+    const id = '123456'
+    // probar si se peude utilzia redis para el cahe y luego tiempo real en chat con next js
+    //  y probar con el otro modelo
+    // const chain = this.cohereModelEmbedService.productChain
+
+    // obtener la base de datos de pinecone
+    const index = this.getPineconeStore('dev', 'list-products')
+
+    // Buscar productos en la base de datos Pinecone
+    const result = await index.similaritySearch(text, 3)
+
+    // Contexto de productos
+    const context = result.map(({ pageContent }) => pageContent).join('\n\n')
+
+    // Obtener la respuesta del chat
+    const responseAI = await this.chatStream(text, id, context)
+
+    return {
+      responseAI,
+    }
+  }
+
+  private async chatStream(text: string, id: string, context: string) {
+    const chat = this.cohereModelEmbedService.withMemory(id)
+    const stream = await chat.stream(
+      {
+        context,
+        question: text,
+      },
+      {
+        configurable: {
+          sessionId: id,
+        },
+      },
+    )
+    let chunkFullResponse: string = ''
+    for await (const chunk of stream) {
+      const isString = typeof chunk === 'string'
+      if (!isString) continue
+      chunkFullResponse += chunk
+
+      console.log({
+        chunk,
+      })
+    }
+    return chunkFullResponse
+  }
+
+  private async chatInvoke(text: string, id: string, context: string) {
+    const chat = this.cohereModelEmbedService.withMemory(id)
+    // // esta fallando el historial creo, no lo estoy configurando bien, cada rato holadice
+    const responseAI = await chat.invoke(
+      {
+        context,
+        question: text,
+      },
+      {
+        configurable: {
+          sessionId: id,
+        },
+      },
+    )
+    const isString = typeof responseAI === 'string'
+    if (!isString) return
+    return responseAI
+  }
+
+  private getPineconeStore(
+    namespace: string,
+    indexName: string,
+  ): PineconeStore {
+    // index ->  'list-products',
+    // namespace -> dev
+    return this.pineconeService.getPineconeStore(
       this.cohereModelEmbedService.embeddings,
       {
         namespace: 'dev',
         textKey: 'pageContent',
         pineconeIndex: this.pineconeService.getPineconeIndexName(
-          'list-products',
-          'dev',
+          indexName,
+          namespace,
         ),
         maxConcurrency: 2,
         maxRetries: 2,
         onFailedAttempt: (error) => this.logger.error(error),
       },
     )
-
-    const result = await index.similaritySearch(text, 3)
-    const context = result.map(({ pageContent }) => pageContent).join('\n\n')
-
-    const responseAI = await this.cohereModelEmbedService.productChain.invoke({
-      context,
-      question: text,
-    })
-
-    return {
-      responseAI,
-    }
   }
 
   private async insertForBatch(pineconeStore: PineconeStore) {
