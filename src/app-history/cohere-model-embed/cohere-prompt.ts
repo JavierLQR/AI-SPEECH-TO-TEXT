@@ -67,6 +67,7 @@ import { ChatPromptTemplate } from '@langchain/core/prompts'
 
 // Método	¿Incluye historial (chat_history)?	¿Soporta estructura tipo chat?	¿Más flexible para IA conversacional?
 // fromMessages([...])	✅ Sí (con 'placeholder')	✅ Sí	✅ Sí
+
 export const coherePrompt = ChatPromptTemplate.fromMessages([
   [
     'system',
