@@ -150,15 +150,17 @@ export class AppHistoryService {
   ): PineconeStore {
     // index ->  'list-products',
     // namespace -> dev
+    const pineconeIndex = this.pineconeService.getPineconeIndexName(
+      indexName,
+      namespace,
+    )
+
     return this.pineconeService.getPineconeStore(
       this.cohereModelEmbedService.embeddings,
       {
-        namespace: 'dev',
+        namespace,
         textKey: 'pageContent',
-        pineconeIndex: this.pineconeService.getPineconeIndexName(
-          indexName,
-          namespace,
-        ),
+        pineconeIndex,
         maxConcurrency: 2,
         maxRetries: 2,
         onFailedAttempt: (error) => this.logger.error(error),
