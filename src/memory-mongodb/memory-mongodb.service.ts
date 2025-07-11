@@ -4,18 +4,20 @@ import { GetModelService } from './model/model.service'
 
 import { PineconeStore } from '@langchain/pinecone'
 
+import { CohereEmbeddings } from '@langchain/cohere'
+import { DocumentInterface } from '@langchain/core/documents'
+import { ConfigService } from '@nestjs/config'
 import {
   Index,
   Pinecone as PineconeClient,
   RecordMetadata,
 } from '@pinecone-database/pinecone'
-import { ConfigService } from '@nestjs/config'
-import { CohereEmbeddings } from '@langchain/cohere'
-import { DocumentInterface } from '@langchain/core/documents'
 
-import * as Pusher from 'pusher'
 import { IterableReadableStream } from '@langchain/core/dist/utils/stream'
 import { AIMessageChunk } from '@langchain/core/messages'
+import { InjectRedis } from '@nestjs-modules/ioredis'
+import Redis from 'ioredis'
+import * as Pusher from 'pusher'
 
 @Injectable()
 export class MemoryMongodbService {
@@ -35,6 +37,7 @@ export class MemoryMongodbService {
   constructor(
     readonly getModelService: GetModelService,
     private readonly configService: ConfigService,
+    @InjectRedis() private readonly redis: Redis,
   ) {
     this.pusher = new Pusher({
       appId: configService.getOrThrow<string>('PUSHER_APP_ID'),
@@ -110,7 +113,7 @@ export class MemoryMongodbService {
 
     const vectorStorage = await this.getPineconeStore(pineconeIndex)
 
-    const results = await vectorStorage.similaritySearch(text, 5)
+    const results = await vectorStorage.similaritySearch(text, 3)
 
     const formatToPrompt = this.formatResultSimilarity(results)
     this.logger.debug({ formatToPrompt })
@@ -126,11 +129,11 @@ export class MemoryMongodbService {
     // })
     let fullChunks: string = ''
     for await (const text of response as IterableReadableStream<AIMessageChunk>) {
+      const isString = typeof text.content === 'string'
       // ya esta probar con redis y pusher
-      console.log({ text: text.content })
 
-      // if (!isString) continue
-      // fullChunks += text
+      if (!isString) continue
+      fullChunks += text.content as string
       // await this.pusher.trigger('my-channel', 'my-event', {
       //   message: text,
       // })
