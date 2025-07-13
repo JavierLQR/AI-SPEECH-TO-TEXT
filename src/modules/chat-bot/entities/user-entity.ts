@@ -20,19 +20,23 @@ class RetrievedProduct {
   collection: 'chat_history_user',
 })
 export class ChatHistoryUserEntity extends Document {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true, type: String })
   sessionId: string
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   userQuestion: string
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   assistantResponse: string
 
   @Prop({ type: [RetrievedProduct], required: true })
   retrievedProducts: RetrievedProduct[]
 
-  @Prop()
+  @Prop({
+    required: true,
+    type: String,
+    unique: true,
+  })
   userId: string
 
   @Prop()
