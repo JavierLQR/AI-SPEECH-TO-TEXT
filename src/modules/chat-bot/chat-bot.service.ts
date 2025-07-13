@@ -1,45 +1,37 @@
 import { MongoDBChatMessageHistory } from '@langchain/mongodb'
 import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 
-import { Collection, MongoClient } from 'mongodb'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
+
+import { Collection } from 'mongodb'
+import { MongoHistoryChatService } from '../app-history/mongo-history-chat/mongo-history-chat.service'
+import { ChatHistoryUserEntity } from './entities/user-entity'
+
 @Injectable()
 export class ChatBotService {
-  private readonly client: MongoClient
-  private readonly collection: Collection
+  constructor(
+    private readonly mongoHistoryChatService: MongoHistoryChatService,
+    @InjectModel(ChatHistoryUserEntity.name)
+    private readonly chatHistoryUserEntity: Model<ChatHistoryUserEntity>,
+  ) {}
 
-  constructor(private readonly configService: ConfigService) {
-    this.client = new MongoClient(
-      this.configService.getOrThrow<string>('DATABASE_MONGO_URI'),
-      {
-        driverInfo: {
-          name: 'Langchaing',
-        },
-        ssl: true,
-      },
-    )
-    this.collection = this.client.db('langchaing').collection('memory')
+  private get getColletion(): Collection {
+    return this.mongoHistoryChatService.Colletion
   }
 
   /**
    * getMessages
    */
   public async getMessages() {
-    const history = new MongoDBChatMessageHistory({
-      collection: this.collection,
-      sessionId: '123456',
+    const collection = new MongoDBChatMessageHistory({
+      collection: this.getColletion,
+      sessionId: 'chatbot',
     })
-    const messages = await history.getMessages()
-    console.log({
-      messages,
-    })
-
-    const format = messages.map((message) => ({
-      role: message.getType(),
-      content: message.text,
-    }))
+    const messages = await collection.getMessages()
     return {
-      format,
+      messages,
+      sessionId: '123456',
     }
   }
 }
