@@ -5,6 +5,7 @@ import { PrismaService } from 'nestjs-prisma'
 
 import { CohereModelEmbedService } from './cohere-model-embed/cohere-model-embed.service'
 import { PineconeStore } from '@langchain/pinecone'
+import { PusherService } from './pusher/pusher.service'
 // import { MongoDBChatMessageHistory } from '@langchain/mongodb'
 
 @Injectable()
@@ -16,6 +17,7 @@ export class AppHistoryService {
 
     private readonly pineconeService: PineconeService,
     private readonly cohereModelEmbedService: CohereModelEmbedService,
+    private readonly pusherService: PusherService,
 
     private readonly prismaService: PrismaService,
   ) {}
@@ -83,10 +85,10 @@ export class AppHistoryService {
     // const chain = this.cohereModelEmbedService.productChain
 
     // obtener la base de datos de pinecone
-    const index = this.getPineconeStore('dev', 'list-products')
+    const indexPinecone = this.getPineconeStore('dev', 'list-products')
 
     // Buscar productos en la base de datos Pinecone
-    const result = await index.similaritySearch(text, 3)
+    const result = await indexPinecone.similaritySearch(text, 3)
 
     // Contexto de productos
     const context = result.map(({ pageContent }) => pageContent).join('\n\n')
@@ -118,9 +120,7 @@ export class AppHistoryService {
       if (!isString) continue
       chunkFullResponse += chunk
 
-      console.log({
-        chunk,
-      })
+      await this.pusherService.trigger(chunk)
     }
     return chunkFullResponse
   }

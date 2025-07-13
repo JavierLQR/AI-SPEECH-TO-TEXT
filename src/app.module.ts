@@ -1,26 +1,28 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PrismaModule } from 'nestjs-prisma'
-import { AiQwenModule } from './ai-qwen/ai-qwen.module'
-import { ChatModule } from './chat/chat.module'
-import { EmbeddingsProductsModule } from './embeddings-products/embeddings-products.module'
-import { GeminiSpeechModule } from './gemini-speech/gemini-speech.module'
-import { GroqCloudModule } from './groq-cloud/speech-to-text-and-text-to-speech/groq-cloud.module'
-import { DeepseekModule } from './ia-lanchaing/deepseek/deepseek.module'
-import { IaLanchaingModule } from './ia-lanchaing/mistral/ia-lanchaing.module'
-import { IaMistralModule } from './ia-mistral/ia-mistral.module'
-import { LanchaingHistoryMemoryModule } from './lanchaing-history-memory/lanchaing-history-memory.module'
-import { LanchaingMemoryPostgresModule } from './lanchaing-memory-postgres/lanchaing-memory-postgres.module'
-import { MitralVisionModule } from './mitral-vision/mitral-vision.module'
-import { PineconeModule } from './pinecone/pinecone.module'
-import { SpeedToTextModule } from './speed-to-text/speed-to-text.module'
-
 import { RedisModule } from '@nestjs-modules/ioredis'
-import { PineconeProductsQuerysModule } from './pinecone-products-querys/pinecone-products-querys.module'
-import { FireworksAiModule } from './fireworks-ai/fireworks-ai.module'
-import { MitralStreamingsModule } from './mitral-streamings/mitral-streamings.module'
-import { MemoryMongodbModule } from './memory-mongodb/memory-mongodb.module'
-import { AppHistoryModule } from './app-history/app-history.module'
+
+import { AiQwenModule } from './modules/ai-qwen/ai-qwen.module'
+import { ChatModule } from './modules/chat/chat.module'
+import { EmbeddingsProductsModule } from './modules/embeddings-products/embeddings-products.module'
+import { GeminiSpeechModule } from './modules/gemini-speech/gemini-speech.module'
+import { GroqCloudModule } from './modules/groq-cloud/speech-to-text-and-text-to-speech/groq-cloud.module'
+import { DeepseekModule } from './modules/ia-lanchaing/deepseek/deepseek.module'
+import { IaLanchaingModule } from './modules/ia-lanchaing/mistral/ia-lanchaing.module'
+import { IaMistralModule } from './modules/ia-mistral/ia-mistral.module'
+import { LanchaingHistoryMemoryModule } from './modules/lanchaing-history-memory/lanchaing-history-memory.module'
+import { LanchaingMemoryPostgresModule } from './modules/lanchaing-memory-postgres/lanchaing-memory-postgres.module'
+import { MitralVisionModule } from './modules/mitral-vision/mitral-vision.module'
+import { PineconeModule } from './modules/pinecone/pinecone.module'
+import { SpeedToTextModule } from './modules/speed-to-text/speed-to-text.module'
+
+import { PineconeProductsQuerysModule } from './modules/pinecone-products-querys/pinecone-products-querys.module'
+import { FireworksAiModule } from './modules/fireworks-ai/fireworks-ai.module'
+import { MitralStreamingsModule } from './modules/mitral-streamings/mitral-streamings.module'
+import { MemoryMongodbModule } from './modules/memory-mongodb/memory-mongodb.module'
+import { AppHistoryModule } from './modules/app-history/app-history.module'
+import { ChatBotModule } from './modules/chat-bot/chat-bot.module'
 @Module({
   imports: [
     RedisModule.forRootAsync({
@@ -61,6 +63,7 @@ import { AppHistoryModule } from './app-history/app-history.module'
     MitralStreamingsModule,
     MemoryMongodbModule,
     AppHistoryModule,
+    ChatBotModule,
   ],
   controllers: [],
 })
