@@ -5,5 +5,6 @@ import { PineconeController } from './pinecone.controller'
 @Module({
   controllers: [PineconeController],
   providers: [PineconeService],
+  exports: [PineconeService],
 })
 export class PineconeModule {}
