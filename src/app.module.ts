@@ -23,8 +23,27 @@ import { MitralStreamingsModule } from './modules/mitral-streamings/mitral-strea
 import { MemoryMongodbModule } from './modules/memory-mongodb/memory-mongodb.module'
 import { AppHistoryModule } from './modules/app-history/app-history.module'
 import { ChatBotModule } from './modules/chat-bot/chat-bot.module'
+import { MongooseModule } from '@nestjs/mongoose'
+import { DevtoolsModule } from '@nestjs/devtools-integration'
+import { MastraCerebrasAiModule } from './modules/mastra-cerebras-ai/mastra-cerebras-ai.module'
+
 @Module({
   imports: [
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
+    }),
+
+    MongooseModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.getOrThrow<string>('DATABASE_MONGO_URI'),
+        driverInfo: {
+          name: 'Langchaing',
+        },
+        ssl: true,
+      }),
+      inject: [ConfigService],
+    }),
+
     RedisModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         type: 'single',
@@ -64,6 +83,7 @@ import { ChatBotModule } from './modules/chat-bot/chat-bot.module'
     MemoryMongodbModule,
     AppHistoryModule,
     ChatBotModule,
+    MastraCerebrasAiModule,
   ],
   controllers: [],
 })
