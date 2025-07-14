@@ -3,7 +3,9 @@ import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    snapshot: true,
+  })
   app.useLogger(
     process.env.NODE_ENV === 'production'
       ? ['error', 'warn']
