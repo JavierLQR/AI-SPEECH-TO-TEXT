@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, Query } from '@nestjs/common'
 import { ChatBotService } from './chat-bot.service'
 
 @Controller({
@@ -9,7 +9,7 @@ export class ChatBotController {
   constructor(private readonly chatBotService: ChatBotService) {}
 
   @Get()
-  getMessages() {
-    return this.chatBotService.getMessages()
+  getMessages(@Query('text') text: string) {
+    return this.chatBotService.getMessages(text)
   }
 }
