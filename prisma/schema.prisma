@@ -90,3 +90,22 @@ model Product {
   categoryId  Int
   createdAt   DateTime @default(now())
 }
+
+model CategoryChatBot {
+  id       String           @id @default(uuid())
+  name     String           @unique
+  products ProductChatBot[]
+}
+
+model ProductChatBot {
+  id          String          @id @default(uuid())
+  name        String          @unique
+  description String
+  price       Decimal         @db.Decimal(10, 2)
+  imageUrl    String
+  stock       Int
+  categoryId  String
+  category    CategoryChatBot @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
