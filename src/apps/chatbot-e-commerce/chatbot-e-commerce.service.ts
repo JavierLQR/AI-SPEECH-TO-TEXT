@@ -38,16 +38,42 @@ export class ChatbotECommerceService {
       model: this.configService.getOrThrow<string>(
         'MISTRAL_MODEL_LANCHAING_CHAT',
       ),
-      temperature: 0.4,
+      temperature: 0,
       maxRetries: 3,
       maxConcurrency: 2,
-      maxTokens: 10,
+      maxTokens: 300,
 
       onFailedAttempt: (error) => this.logger.error(error),
     })
 
     const parsed = new StringOutputParser()
     this.chain = mitralPrompt.pipe(this.chatMistralAI).pipe(parsed)
+  }
+
+  /**
+   * chatBotEcommmerce
+   */
+  public async chatBotEcommmerce(question: string) {
+    this.logger.verbose(`Question "(${question})"`)
+
+    const search = await this.getPineconeStore(
+      'bot-e-commerce',
+    ).similaritySearchWithScore(question, 3)
+
+    const context = search
+      .map(([{ pageContent }, score]) => `${pageContent} (Score: ${score})`)
+      .join('\n\n')
+
+    const response = await this.chain.invoke({ question, context })
+
+    return ApiResponse({
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      data: {
+        response,
+      },
+      service: 'chatbot-ecommerce',
+    })
   }
 
   /**
