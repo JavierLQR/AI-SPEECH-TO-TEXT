@@ -45,6 +45,7 @@ export class ChatbotECommerceService {
 
       onFailedAttempt: (error) => this.logger.error(error),
     })
+
     const parsed = new StringOutputParser()
     this.chain = mitralPrompt.pipe(this.chatMistralAI).pipe(parsed)
   }
