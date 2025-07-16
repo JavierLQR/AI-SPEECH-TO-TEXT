@@ -19,4 +19,9 @@ export class ChatbotECommerceController {
   insertAllProductsInIndex(@Query('name') name: string) {
     return this.chatbotECommerceService.insertAllProductsInIndex(name)
   }
+
+  @Get('chat-ecommerce-bot')
+  chatBotEcommmerce(@Query('question') question: string) {
+    return this.chatbotECommerceService.chatBotEcommmerce(question)
+  }
 }
