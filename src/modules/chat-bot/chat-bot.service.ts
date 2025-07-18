@@ -77,21 +77,21 @@ export class ChatBotService {
       fullResponse,
     })
 
-    // await this.chatHistoryUserEntity.create({
-    //   sessionId: '123456',
-    //   userQuestion: text,
-    //   assistantResponse: fullResponse,
-    //   retrievedProducts: similaritySearch.map(([{ metadata }, score]) => ({
-    //     name: metadata.name ?? '',
-    //     score,
-    //   })),
-    //   userId: '123456',
-    //   embeddingUsed: await modelEmbeddings.embedQuery(text),
-    //   messageId: '123456',
-    //   tokensUsed: 1000,
-    //   latencyMs: 1000,
-    //   promptTemplate: 'prompt',
-    //   modelName: 'Cohere',
-    // })
+    await this.chatHistoryUserEntity.create({
+      sessionId: '123456',
+      userQuestion: text,
+      assistantResponse: fullResponse,
+      retrievedProducts: similaritySearch.map(([{ metadata }, score]) => ({
+        name: metadata.name ?? '',
+        score,
+      })),
+      userId: '123456',
+      embeddingUsed: await modelEmbeddings.embedQuery(text),
+      messageId: '123456',
+      tokensUsed: 1000,
+      latencyMs: 1000,
+      promptTemplate: 'prompt',
+      modelName: 'Cohere',
+    })
   }
 }
