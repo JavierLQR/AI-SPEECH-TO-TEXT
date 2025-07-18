@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
-import { Collection, MongoClient } from 'mongodb'
+import { Collection, MongoClient, ObjectId } from 'mongodb'
 
 @Injectable()
 export class MongoHistoryChatService {
@@ -19,6 +19,10 @@ export class MongoHistoryChatService {
       },
     )
     this.collection = this.client.db('langchaing').collection('memory')
+  }
+
+  public get getObjetId(): string {
+    return new ObjectId().toString()
   }
 
   public get Colletion(): Collection {
