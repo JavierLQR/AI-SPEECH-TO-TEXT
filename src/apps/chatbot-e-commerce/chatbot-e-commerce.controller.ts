@@ -1,9 +1,11 @@
-import { Controller, Get, Query } from '@nestjs/common'
+import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common'
+import { ChatbotSessionsDto } from '../dtos/chatbot-sessions.dto'
 import { ChatbotECommerceService } from './chatbot-e-commerce.service'
 
 @Controller({
   version: '1',
   path: 'chatbot-e-commerce',
+  durable: true,
 })
 export class ChatbotECommerceController {
   constructor(
@@ -11,17 +13,26 @@ export class ChatbotECommerceController {
   ) {}
 
   @Get('create-index')
+  @HttpCode(HttpStatus.CREATED)
   async createIndex(@Query('name') name: string) {
     return await this.chatbotECommerceService.createIndex(name)
   }
 
+  @HttpCode(HttpStatus.OK)
   @Get('insert-data-in-index')
   insertAllProductsInIndex(@Query('name') name: string) {
     return this.chatbotECommerceService.insertAllProductsInIndex(name)
   }
 
+  @HttpCode(HttpStatus.OK)
   @Get('chat-ecommerce-bot')
-  chatBotEcommmerce(@Query('question') question: string) {
-    return this.chatbotECommerceService.chatBotEcommmerce(question)
+  chatBotEcommmerce(@Query() chatbotSessionsDto: ChatbotSessionsDto) {
+    return this.chatbotECommerceService.chatBotEcommmerce(chatbotSessionsDto)
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('chat-ecommerce-bot/find-chat-history')
+  findChatHistory(@Query() findChatHistoryDto: ChatbotSessionsDto) {
+    return this.chatbotECommerceService.findChatHistory(findChatHistoryDto)
   }
 }
