@@ -1,5 +1,13 @@
-import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common'
-import { ChatbotSessionsDto } from '../dtos/chatbot-sessions.dto'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+} from '@nestjs/common'
+import { ChatbotSessionsDto } from './dto/chatbot-sessions.dto'
 import { ChatbotECommerceService } from './chatbot-e-commerce.service'
 
 @Controller({
@@ -28,6 +36,16 @@ export class ChatbotECommerceController {
   @Get('chat-ecommerce-bot')
   chatBotEcommmerce(@Query() chatbotSessionsDto: ChatbotSessionsDto) {
     return this.chatbotECommerceService.chatBotEcommmerce(chatbotSessionsDto)
+  }
+
+  @Post('auth/pusher')
+  authPusher(@Body() body: any) {
+    console.log({
+      body,
+    })
+    return {
+      body,
+    }
   }
 
   @HttpCode(HttpStatus.OK)
