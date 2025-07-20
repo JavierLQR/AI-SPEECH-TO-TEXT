@@ -39,6 +39,12 @@ export class ChatHistoryUserEntity extends Document {
   })
   userId: string
 
+  @Prop({ type: Boolean, default: false, required: true })
+  isUser: boolean
+
+  @Prop({ required: true, type: String })
+  role: 'user' | 'assistant'
+
   @Prop()
   ip?: string
 
