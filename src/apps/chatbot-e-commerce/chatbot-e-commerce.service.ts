@@ -10,8 +10,12 @@ import * as Pusher from 'pusher'
 import { ApiResponse } from 'src/common/utils/response.client'
 import { MongoHistoryChatService } from 'src/modules/app-history/mongo-history-chat/mongo-history-chat.service'
 import { PineconeService } from 'src/modules/app-history/pinecone/pinecone.service'
-import { ChatbotSessionsDto } from '../dtos/chatbot-sessions.dto'
-import { mitralPrompt, promptText } from './prompt'
+import { ChatHistoryUserEntity } from 'src/modules/chat-bot/entities/user-entity'
+import { ChatbotSessionsDto } from './dto/chatbot-sessions.dto'
+import { FilterFindHistoryService } from './filters/filters'
+import { PartialHistoryChat } from './interfaces/partial-history-chat.interface'
+// import { HistoryChatMapper } from './mappers/history-chat.mapper'
+import { mitralPrompt } from './prompt'
 
 // Modules Langchain
 import { Document } from '@langchain/core/documents'
@@ -20,9 +24,9 @@ import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { RunnableWithMessageHistory } from '@langchain/core/runnables'
 import { ChatMistralAI, MistralAIEmbeddings } from '@langchain/mistralai'
 import { MongoDBChatMessageHistory } from '@langchain/mongodb'
-import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
-import { ChatHistoryUserEntity } from 'src/modules/chat-bot/entities/user-entity'
+import { Model } from 'mongoose'
+import { ChatMessage } from './entitie/chatbot-e-commerce.entity'
 
 @Injectable()
 export class ChatbotECommerceService {
@@ -43,6 +47,11 @@ export class ChatbotECommerceService {
 
     @InjectModel(ChatHistoryUserEntity.name)
     private readonly modelChatHistoryUserEntity: Model<ChatHistoryUserEntity>,
+
+    @InjectModel(ChatMessage.name)
+    private readonly modelHistoryChat: Model<ChatMessage>,
+
+    private readonly filterFindHistoryService: FilterFindHistoryService,
   ) {
     this.mistralAIEmbeddings = new MistralAIEmbeddings({
       apiKey: this.configService.getOrThrow<string>('MISTRAL_API_KEY'),
@@ -59,7 +68,6 @@ export class ChatbotECommerceService {
       secret: this.configService.getOrThrow<string>('PUSHER_SECRET'),
       cluster: this.configService.getOrThrow<string>('PUSHER_CLUSTER'),
       useTLS: true,
-      timeout: 10000,
     })
 
     this.chatMistralAI = new ChatMistralAI({
@@ -84,19 +92,18 @@ export class ChatbotECommerceService {
    */
   public async findChatHistory(chatbotSessionsDto: ChatbotSessionsDto) {
     const { sessionId, userId } = chatbotSessionsDto
+    this.logger.verbose(`SessionId: "(${sessionId})" | UserId: "(${userId})"`)
 
-    const chatsHistory = await this.modelChatHistoryUserEntity
+    const chatsHistory = await this.modelHistoryChat
       .find({
         userId,
         sessionId,
       })
-      .select({
-        _id: true,
-        sessionId: true,
-        userQuestion: true,
-        assistantResponse: true,
-      })
-      .lean()
+      .select(this.filterFindHistoryService.projection)
+      .sort({ createdAt: 1, _id: 1 })
+      .lean<PartialHistoryChat[]>()
+
+    // const mapper = HistoryChatMapper(chatsHistory)
 
     return ApiResponse({
       statusCode: HttpStatus.OK,
@@ -116,7 +123,7 @@ export class ChatbotECommerceService {
       `Question "(${question})" | SessionId "(${sessionId})" | UserId "(${userId})"`,
     )
 
-    const session_id = this.mongoHistoryChatService.getObjetId || sessionId
+    const session_id = sessionId || this.mongoHistoryChatService.getObjetId
 
     const chain = this.getChainWithMemory(session_id)
 
@@ -138,8 +145,18 @@ export class ChatbotECommerceService {
     for await (const chunk of response as AsyncIterable<string>) {
       const isString = typeof chunk === 'string'
       if (!isString) continue
-      console.log(`${chunk}|`)
+      console.log(chunk)
+      console.log({
+        session_id,
+      })
 
+      await this.pusher.trigger(`private-chat-123`, 'event', {
+        message: chunk,
+      })
+
+      // await this.pusher.trigger(`test`, 'my-event', {
+      //   message: chunk,
+      // })
       fullReponse += chunk
     }
 
@@ -156,7 +173,7 @@ export class ChatbotECommerceService {
       message: 'Success',
       data: {
         sessionId,
-        response,
+        response: fullReponse,
       },
       service: 'chatbot-ecommerce',
     })
@@ -169,17 +186,23 @@ export class ChatbotECommerceService {
     fullReponse: string,
     retrievedProducts: { name: string; score: number }[],
   ) {
-    await this.modelChatHistoryUserEntity.create({
-      sessionId,
-      userId,
-      userQuestion: question,
-      assistantResponse: fullReponse,
-      promptTemplate: JSON.stringify(promptText),
-      retrievedProducts,
-      embeddingUsed: await this.mistralAIEmbeddings.embedQuery(question),
-      messageId: this.mongoHistoryChatService.getObjetId,
-      modelName: this.chatMistralAI.getName(),
-    })
+    await this.modelHistoryChat.create([
+      {
+        sessionId,
+        userId,
+        content: question,
+        role: 'user',
+        isUser: true,
+      },
+      {
+        sessionId,
+        userId,
+        content: fullReponse,
+        role: 'assistant',
+        isUser: false,
+        retrievedProducts,
+      },
+    ])
   }
 
   private async getSimilaritySearchWithScore(question: string, k: number) {
