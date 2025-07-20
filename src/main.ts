@@ -6,7 +6,15 @@ import { ValidationPipe } from '@nestjs/common'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
+    cors: true,
   })
+
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+  })
+
   app.useLogger(
     process.env.NODE_ENV === 'production'
       ? ['error', 'warn']
