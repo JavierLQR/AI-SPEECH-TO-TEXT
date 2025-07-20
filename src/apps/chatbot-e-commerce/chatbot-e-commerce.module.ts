@@ -9,6 +9,9 @@ import {
   ChatHistoryUserEntity,
   ChatHistoryUserSchema,
 } from 'src/modules/chat-bot/entities/user-entity'
+import { FilterFindHistoryService } from './filters/filters'
+import { ChatMessageSchema } from './entitie/chatbot-e-commerce.entity'
+import { ChatMessage } from '@langchain/core/messages'
 
 @Module({
   imports: [
@@ -17,11 +20,15 @@ import {
         name: ChatHistoryUserEntity.name,
         useFactory: () => ChatHistoryUserSchema,
       },
+      {
+        name: ChatMessage.name,
+        useFactory: () => ChatMessageSchema,
+      },
     ]),
     PineconeModule,
     MongoHistoryChatModule,
   ],
   controllers: [ChatbotECommerceController],
-  providers: [ChatbotECommerceService],
+  providers: [ChatbotECommerceService, FilterFindHistoryService],
 })
 export class ChatbotECommerceModule {}
