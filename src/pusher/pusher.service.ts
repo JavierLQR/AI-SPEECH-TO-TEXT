@@ -8,6 +8,7 @@ export class PusherService {
   private readonly logger: Logger = new Logger(PusherService.name)
 
   constructor(private readonly configService: ConfigService) {
+    this.logger.log('Initializing Pusher service with configuration')
     this.pusher = new Pusher({
       appId: this.configService.getOrThrow<string>('PUSHER_APP_ID'),
       key: this.configService.getOrThrow<string>('PUSHER_KEY'),
@@ -35,6 +36,10 @@ export class PusherService {
 
   authorizeChannel(socketId: string, channel: string, userId: string) {
     if (this.canUserAccessChannel(userId, channel)) {
+      this.logger.log('Authorizing private channel access', {
+        socketId,
+        channel,
+      })
       return this.pusher.authorizeChannel(socketId, channel)
     }
     throw new Error('Unauthorized')
@@ -46,6 +51,10 @@ export class PusherService {
   }
 
   async sendToPrivateChannel(channel: string, event: string, data: any) {
+    this.logger.log(`Sending message to private channel: ${channel}`, {
+      event,
+      data,
+    })
     await this.pusher.trigger(channel, event, data)
   }
 }
