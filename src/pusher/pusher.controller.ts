@@ -19,14 +19,12 @@ export class PusherController {
 
     try {
       if (channel_name.startsWith('presence-')) {
-        // Para canales de presencia
         return this.pusherService.authenticateUser(
           socket_id,
           channel_name,
           userData,
         )
       } else if (channel_name.startsWith('private-')) {
-        // Para canales privados
         return this.pusherService.authorizeChannel(
           socket_id,
           channel_name,
