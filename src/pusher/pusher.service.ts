@@ -17,7 +17,6 @@ export class PusherService {
     })
   }
 
-  // Método para autenticar usuarios en canales privados
   authenticateUser(
     socketId: string,
     channel: string,
