@@ -10,9 +10,8 @@ export class PusherController {
   authenticateUser(@Body() body: { socket_id: string; channel_name: string }) {
     const { socket_id, channel_name } = body
 
-    // Aquí normalmente validarías el token JWT del usuario
     const userData = {
-      userId: '123', // ID del usuario autenticado
+      userId: '123',
       name: 'Usuario Ejemplo',
       email: 'usuario@ejemplo.com',
     }
