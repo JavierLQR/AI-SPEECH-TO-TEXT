@@ -42,7 +42,12 @@ export class PusherController {
     body: {
       channel: string
       event: string
-      data: { message: string; userId: string }
+      data: {
+        id: string
+        message: string
+        userId: string
+        timestamp: string
+      }
       userId: string
     },
   ) {
