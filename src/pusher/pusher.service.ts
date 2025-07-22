@@ -50,7 +50,16 @@ export class PusherService {
     return channel.includes(`user-${userId}`)
   }
 
-  async sendToPrivateChannel(channel: string, event: string, data: any) {
+  async sendToPrivateChannel(
+    channel: string,
+    event: string,
+    data: {
+      id: string
+      message: string
+      userId: string
+      timestamp: string
+    },
+  ) {
     this.logger.log(`Sending message to private channel: ${channel}`, {
       event,
       data,
