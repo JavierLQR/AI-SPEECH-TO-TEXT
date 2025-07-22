@@ -34,22 +34,18 @@ export class PusherService {
     return this.pusher.authorizeChannel(socketId, channel, presenceData)
   }
 
-  // Método para autorizar canales privados
   authorizeChannel(socketId: string, channel: string, userId: string) {
-    // Lógica de autorización personalizada
     if (this.canUserAccessChannel(userId, channel)) {
       return this.pusher.authorizeChannel(socketId, channel)
     }
     throw new Error('Unauthorized')
   }
 
-  // Lógica personalizada para verificar acceso al canal
   private canUserAccessChannel(userId: string, channel: string): boolean {
     // Ejemplo: solo permitir acceso a canales que contengan el ID del usuario
     return channel.includes(`user-${userId}`)
   }
 
-  // Enviar mensaje a canal privado
   async sendToPrivateChannel(channel: string, event: string, data: any) {
     await this.pusher.trigger(channel, event, data)
   }
