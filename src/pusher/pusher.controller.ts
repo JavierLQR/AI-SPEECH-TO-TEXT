@@ -1,45 +1,65 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common'
+// pusher/pusher.controller.ts
+import { Body, Controller, Post } from '@nestjs/common'
 import { PusherService } from './pusher.service'
 
 @Controller('pusher')
 export class PusherController {
-  constructor(private readonly pusherService: PusherService) {}
+  constructor(private pusherService: PusherService) {}
 
   @Post('auth')
-  authenticate(
-    @Body('socket_id') socketId: string,
-    @Body('channel_name') channelName: string,
-    @Body('user_id') userId: string,
-  ) {
-    console.log({
-      authenticate: 'auth',
-      socketId,
-      channelName,
-      userId,
-    })
+  authenticateUser(@Body() body: { socket_id: string; channel_name: string }) {
+    const { socket_id, channel_name } = body
 
-    if (!userId) throw new UnauthorizedException('User ID is required')
+    // Aquí normalmente validarías el token JWT del usuario
+    const userData = {
+      userId: '123', // ID del usuario autenticado
+      name: 'Usuario Ejemplo',
+      email: 'usuario@ejemplo.com',
+    }
 
-    return this.pusherService.authenticate(userId, socketId, channelName)
+    try {
+      if (channel_name.startsWith('presence-')) {
+        // Para canales de presencia
+        return this.pusherService.authenticateUser(
+          socket_id,
+          channel_name,
+          userData,
+        )
+      } else if (channel_name.startsWith('private-')) {
+        // Para canales privados
+        return this.pusherService.authorizeChannel(
+          socket_id,
+          channel_name,
+          userData.userId,
+        )
+      }
+    } catch (error) {
+      console.error('Error authenticating user:', error)
+      return { error: 'Unauthorized' }
+    }
   }
 
   @Post('send-message')
-  async sendMessage<T>(
-    @Body() body: { channel: string; event: string; data: T },
+  async sendMessage(
+    @Body()
+    body: {
+      channel: string
+      event: string
+      data: { message: string; userId: string }
+      userId: string
+    },
   ) {
-    const { channel, event, data } = body
+    const { channel, event, data, userId } = body
     console.log({
-      sendMessage: 'send-message',
-      channel,
-      event,
-      data,
+      userId,
+      isChanel: channel.includes(`user-${userId}`),
     })
 
-    await this.pusherService.trigger(channel, event, data)
-    return {
-      status: 'success',
-      message: `Event ${event} triggered on channel ${channel}`,
-      data: data,
+    if (channel.includes(`user-${userId}`)) {
+      await this.pusherService.sendToPrivateChannel(channel, event, data)
+      return { success: true }
     }
+
+    return { error: 'Unauthorized' }
   }
 }
