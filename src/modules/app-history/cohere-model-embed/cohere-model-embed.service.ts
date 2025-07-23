@@ -3,13 +3,13 @@ import { ConfigService } from '@nestjs/config'
 
 import { ChatCohere, CohereEmbeddings } from '@langchain/cohere'
 import { StringOutputParser } from '@langchain/core/output_parsers'
-
-import { coherePrompt } from './cohere-prompt'
 import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { RunnableWithMessageHistory } from '@langchain/core/runnables'
 import { MongoDBChatMessageHistory } from '@langchain/mongodb'
-import { MongoHistoryChatService } from '../mongo-history-chat/mongo-history-chat.service'
 import { Collection, ObjectId } from 'mongodb'
+
+import { MongoHistoryChatService } from '../mongo-history-chat/mongo-history-chat.service'
+import { coherePrompt } from './cohere-prompt'
 
 @Injectable()
 export class CohereModelEmbedService {
@@ -52,7 +52,7 @@ export class CohereModelEmbedService {
     })
 
     this.model.withConfig({
-      maxTokens: 300,
+      maxTokens: 150,
     })
 
     const parsed = new StringOutputParser()
