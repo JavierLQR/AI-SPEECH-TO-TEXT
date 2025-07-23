@@ -27,7 +27,8 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { DevtoolsModule } from '@nestjs/devtools-integration'
 import { MastraCerebrasAiModule } from './modules/mastra-cerebras-ai/mastra-cerebras-ai.module'
 import { ChatbotECommerceModule } from './apps/chatbot-e-commerce/chatbot-e-commerce.module'
-import { PusherModule } from './pusher/pusher.module';
+import { PusherModule } from './pusher/pusher.module'
+import { PusherModule } from './apps/pusher/pusher.module'
 
 @Module({
   imports: [
