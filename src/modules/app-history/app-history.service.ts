@@ -118,6 +118,8 @@ export class AppHistoryService {
     for await (const chunk of stream) {
       const isString = typeof chunk === 'string'
       if (!isString) continue
+      console.log(`${chunk}|`)
+
       chunkFullResponse += chunk
 
       await this.pusherService.trigger(chunk)
