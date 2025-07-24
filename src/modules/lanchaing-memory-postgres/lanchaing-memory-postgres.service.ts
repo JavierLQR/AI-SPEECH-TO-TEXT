@@ -174,11 +174,6 @@ export class LanchaingMemoryPostgresService {
   }
 
   async findAllConversations() {
-    const cacheConversations = await this.redis.get('conversations')
-
-    if (cacheConversations)
-      return { conversationsCache: JSON.parse(cacheConversations) }
-
     const conversations =
       await this.prismaService.langchain_chat_histories.findMany({
         orderBy: {

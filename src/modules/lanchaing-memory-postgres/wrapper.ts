@@ -23,7 +23,7 @@ export class CachedPostgresChatMessageHistory
     const cached = await this.redis.get(this.cacheKey)
 
     if (cached) {
-      return JSON.parse(cached)
+      return JSON.parse(cached) as BaseMessage[]
     }
 
     const messages = await super.getMessages()
