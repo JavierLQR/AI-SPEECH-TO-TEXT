@@ -82,7 +82,7 @@ export class ChatBotService {
       userQuestion: text,
       assistantResponse: fullResponse,
       retrievedProducts: similaritySearch.map(([{ metadata }, score]) => ({
-        name: metadata.name ?? '',
+        name: String(metadata.name ?? ''),
         score,
       })),
       userId: '123456',
