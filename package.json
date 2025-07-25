@@ -49,6 +49,7 @@
     "formdata-node": "^6.0.3",
     "groq-sdk": "^0.25.0",
     "ioredis": "^5.6.1",
+    "jest-mock-extended": "^4.0.0",
     "langchain": "^0.3.29",
     "mastra": "^0.10.12",
     "mongodb": "^6.17.0",
