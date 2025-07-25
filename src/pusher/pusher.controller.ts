@@ -2,7 +2,10 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { PusherService } from './pusher.service'
 
-@Controller('pusher')
+@Controller({
+  path: 'pusher',
+  version: '1',
+})
 export class PusherController {
   constructor(private pusherService: PusherService) {}
 
