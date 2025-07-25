@@ -2,7 +2,6 @@ import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as Pusher from 'pusher'
 import { AuthPusherDto } from './dto/auth-pusher.dto'
-import { ChannelPusherDto } from './dto/channel.pusher.dto'
 import { ApiResponse } from 'src/common/helpers/api.response'
 import { SendMessagePusherDto } from './dto/send-message-pusher.dto'
 
