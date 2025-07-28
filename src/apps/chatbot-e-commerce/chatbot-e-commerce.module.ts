@@ -12,9 +12,11 @@ import {
 import { FilterFindHistoryService } from './filters/filters'
 import { ChatMessageSchema } from './entitie/chatbot-e-commerce.entity'
 import { ChatMessage } from '@langchain/core/messages'
+import { PusherModule } from '../pusher/pusher.module'
 
 @Module({
   imports: [
+    PusherModule,
     MongooseModule.forFeatureAsync([
       {
         name: ChatHistoryUserEntity.name,
