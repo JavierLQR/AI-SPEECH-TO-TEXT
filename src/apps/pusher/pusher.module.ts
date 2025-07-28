@@ -5,5 +5,6 @@ import { PusherController } from './pusher.controller'
 @Module({
   controllers: [PusherController],
   providers: [PusherService],
+  exports: [PusherService],
 })
 export class PusherModule {}
