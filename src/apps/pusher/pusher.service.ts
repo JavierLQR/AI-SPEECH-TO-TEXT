@@ -1,9 +1,14 @@
-import { HttpStatus, Injectable, Logger } from '@nestjs/common'
+import {
+  HttpStatus,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as Pusher from 'pusher'
 import { AuthPusherDto } from './dto/auth-pusher.dto'
-import { ApiResponse } from 'src/common/helpers/api.response'
 import { SendMessagePusherDto } from './dto/send-message-pusher.dto'
+import { ApiResponse } from '../../common/helpers/api.response'
 
 @Injectable()
 export class PusherService {
@@ -21,6 +26,43 @@ export class PusherService {
     })
   }
 
+  public async trigger(channelPusherDto: SendMessagePusherDto) {
+    const { channelName, data, eventName, socket_id } = channelPusherDto
+    this.logger.debug({ channelName, data, eventName, socket_id })
+    const channel = await this.pusher.trigger(channelName, eventName, data)
+
+    return ApiResponse({
+      message: 'Channel triggered successfully',
+      data: channel,
+      statusCode: HttpStatus.OK,
+      service: 'PusherService',
+    })
+  }
+
+  /**
+   * async validateUserIdForChannel
+   * @param channel
+   * @param userId
+   * @return boolean
+   * @description Validates if the userId is allowed to access the channel
+   * @throws Error if the userId is not allowed
+   */
+  private validateUserIdForChannel(channel: string, userId: string) {
+    const isValid = channel.includes(`user-${userId}`)
+    console.log({
+      isValid,
+      channel,
+      userId,
+    })
+
+    if (!isValid)
+      throw new UnauthorizedException(
+        `${userId} is not allowed to access this channel`,
+      )
+
+    return isValid
+  }
+
   private typeChannel(channel: string): 'presence' | 'private' | 'public' {
     const recordChannel: Record<string, 'presence' | 'private' | 'public'> = {
       'presence-': 'presence',
@@ -30,40 +72,38 @@ export class PusherService {
     return recordChannel[channel.split('-')[0] + '-'] || 'public'
   }
 
-  public async trigger(channelPusherDto: SendMessagePusherDto) {
-    const { channelName, data, eventName, socket_id } = channelPusherDto
-    const channel = await this.pusher.trigger(channelName, eventName, data, {
-      socket_id,
-    })
-
-    return ApiResponse({
-      message: 'Channel triggered successfully',
-      data: channel,
-      statusCode: HttpStatus.OK,
-      service: 'PusherService',
-    })
-  }
-  /**
-   * async channelPublic
-   */
-  public async channelPublic() {}
-
   /**
    * autentication
    */
-  public authorizeChannel(authPusherDto: AuthPusherDto) {
+  public authorizeChannel(authPusherDto: AuthPusherDto, userId: string) {
     const { socket_id, channel_name } = authPusherDto
-    this.logger.log(`Authenticating user for channel: ${channel_name}`)
-    const { auth } = this.pusher.authorizeChannel(socket_id, channel_name)
+
+    // Saber qué tipo de canal es: presence, private o public
+    const channelType = this.typeChannel(channel_name)
     console.log({
-      socket_id,
+      channelType,
       channel_name,
+      socket_id,
+      userId,
     })
 
-    return {
-      auth,
-      statusCode: HttpStatus.CREATED,
-      message: 'User authenticated successfully',
-    }
+    // Validar solo si es private o presence
+    // para el presence se necesita otro metodo
+    if (channelType === 'private' || channelType === 'presence')
+      this.validateUserIdForChannel(channel_name, userId)
+
+    this.logger.log(
+      `Authenticating user for ${channelType} channel: ${channel_name}`,
+    )
+
+    const { auth } = this.pusher.authorizeChannel(socket_id, channel_name)
+    return ApiResponse({
+      message: 'Authorized',
+      data: {
+        auth,
+      },
+      service: PusherService.name,
+      statusCode: HttpStatus.OK,
+    })
   }
 }
