@@ -12,7 +12,12 @@ export class PusherController {
 
   @Post('auth')
   authenticateUser(@Body() body: AuthPusherDto) {
-    return this.pusherService.authorizeChannel(body)
+    const user = {
+      userId: '1000',
+      name: 'Usuario Ejemplo',
+      email: 'usuario@ejemplo.com',
+    }
+    return this.pusherService.authorizeChannel(body, user.userId)
   }
 
   @Post('send-message')
