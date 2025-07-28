@@ -29,6 +29,7 @@ import { MastraCerebrasAiModule } from './modules/mastra-cerebras-ai/mastra-cere
 import { ChatbotECommerceModule } from './apps/chatbot-e-commerce/chatbot-e-commerce.module'
 // import { PusherModule } from './pusher/pusher.module'
 import { PusherModule } from './apps/pusher/pusher.module'
+import { PushbulletModule } from './modules/pushbullet/pushbullet.module'
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { PusherModule } from './apps/pusher/pusher.module'
     MastraCerebrasAiModule,
     ChatbotECommerceModule,
     PusherModule,
+    PushbulletModule,
   ],
   controllers: [],
 })
