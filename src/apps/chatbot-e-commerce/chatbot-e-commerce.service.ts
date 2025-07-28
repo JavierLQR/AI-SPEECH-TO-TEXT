@@ -4,10 +4,8 @@ import { ConfigService } from '@nestjs/config'
 import { PrismaService } from 'nestjs-prisma'
 
 // Modules Pusher
-import * as Pusher from 'pusher'
 
 // My Modules
-import { ApiResponse } from 'src/common/utils/response.client'
 import { MongoHistoryChatService } from 'src/modules/app-history/mongo-history-chat/mongo-history-chat.service'
 import { PineconeService } from 'src/modules/app-history/pinecone/pinecone.service'
 import { ChatHistoryUserEntity } from 'src/modules/chat-bot/entities/user-entity'
@@ -26,15 +24,15 @@ import { ChatMistralAI, MistralAIEmbeddings } from '@langchain/mistralai'
 import { MongoDBChatMessageHistory } from '@langchain/mongodb'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
+import { ApiResponse } from 'src/common/helpers/api.response'
 import { ChatMessage } from './entitie/chatbot-e-commerce.entity'
+import { PusherService } from '../pusher/pusher.service'
 
 @Injectable()
 export class ChatbotECommerceService {
   private readonly mistralAIEmbeddings: MistralAIEmbeddings
   private readonly chatMistralAI: ChatMistralAI
   private readonly chain: ReturnType<typeof ChatPromptTemplate.prototype.pipe>
-
-  private readonly pusher: Pusher
 
   private readonly logger = new Logger(ChatbotECommerceService.name)
 
@@ -44,6 +42,8 @@ export class ChatbotECommerceService {
 
     private readonly pineconeService: PineconeService,
     private readonly mongoHistoryChatService: MongoHistoryChatService,
+
+    private readonly pusherService: PusherService,
 
     @InjectModel(ChatHistoryUserEntity.name)
     private readonly modelChatHistoryUserEntity: Model<ChatHistoryUserEntity>,
@@ -60,14 +60,6 @@ export class ChatbotECommerceService {
       maxRetries: 3,
 
       onFailedAttempt: (error) => this.logger.error(error),
-    })
-
-    this.pusher = new Pusher({
-      appId: this.configService.getOrThrow<string>('PUSHER_APP_ID'),
-      key: this.configService.getOrThrow<string>('PUSHER_KEY'),
-      secret: this.configService.getOrThrow<string>('PUSHER_SECRET'),
-      cluster: this.configService.getOrThrow<string>('PUSHER_CLUSTER'),
-      useTLS: true,
     })
 
     this.chatMistralAI = new ChatMistralAI({
@@ -117,7 +109,7 @@ export class ChatbotECommerceService {
    * chatBotEcommmerce
    */
   public async chatBotEcommmerce(chatbotSessionsDto: ChatbotSessionsDto) {
-    const { question, sessionId, userId } = chatbotSessionsDto
+    const { question, sessionId, userId, channelMessage } = chatbotSessionsDto
 
     this.logger.verbose(
       `Question "(${question})" | SessionId "(${sessionId})" | UserId "(${userId})"`,
@@ -145,22 +137,22 @@ export class ChatbotECommerceService {
     for await (const chunk of response as AsyncIterable<string>) {
       const isString = typeof chunk === 'string'
       if (!isString) continue
+      const { channelName, eventName, userId } = channelMessage
+      await this.pusherService.trigger({
+        channelName,
+        eventName,
+        data: {
+          message: chunk,
+          userId,
+        },
+        userId,
+      })
       console.log(chunk)
-      console.log({
-        session_id,
-      })
 
-      await this.pusher.trigger(`private-chat-123`, 'event', {
-        message: chunk,
-      })
-
-      // await this.pusher.trigger(`test`, 'my-event', {
-      //   message: chunk,
-      // })
       fullReponse += chunk
     }
 
-    await this.createHistoryChat(
+    void this.createHistoryChat(
       session_id,
       userId,
       question,
@@ -179,14 +171,14 @@ export class ChatbotECommerceService {
     })
   }
 
-  private async createHistoryChat(
+  private createHistoryChat(
     sessionId: string,
     userId: string,
     question: string,
     fullReponse: string,
     retrievedProducts: { name: string; score: number }[],
   ) {
-    await this.modelHistoryChat.create([
+    void this.modelHistoryChat.create([
       {
         sessionId,
         userId,
