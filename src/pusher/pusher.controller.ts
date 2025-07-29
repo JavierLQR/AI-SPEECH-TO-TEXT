@@ -13,6 +13,7 @@ export class PusherController {
   authenticateUser(@Body() body: { socket_id: string; channel_name: string }) {
     const { socket_id, channel_name } = body
 
+    // Simulación de autenticación de usuario (token)
     const userData = {
       userId: '123',
       name: 'Usuario Ejemplo',
