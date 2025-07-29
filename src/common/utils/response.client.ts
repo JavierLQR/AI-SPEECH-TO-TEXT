@@ -1,21 +1,23 @@
 import { HttpStatus } from '@nestjs/common'
 
-type ApiResponse<T> = {
+type Response<T> = {
   message: string
   data?: T
   statusCode?: number
   service?: string
 }
 
-export const ApiResponse = <T>({
+const ApiResponse = <T>({
   message,
   data,
   statusCode = HttpStatus.OK,
   service,
-}: ApiResponse<T>) => ({
+}: Response<T>) => ({
   statusCode,
   message,
   service,
   data,
   timestamp: new Date().toISOString(),
 })
+
+export default ApiResponse
