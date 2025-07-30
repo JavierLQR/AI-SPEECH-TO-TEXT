@@ -13,7 +13,6 @@ import { ChatbotSessionsDto } from './dto/chatbot-sessions.dto'
 @Controller({
   version: '1',
   path: 'chatbot-e-commerce',
-  durable: true,
 })
 export class ChatbotECommerceController {
   constructor(
