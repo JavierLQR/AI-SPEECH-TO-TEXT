@@ -27,8 +27,7 @@ export class PusherService {
   }
 
   public async trigger(channelPusherDto: SendMessagePusherDto) {
-    const { channelName, data, eventName, socket_id } = channelPusherDto
-    this.logger.debug({ channelName, data, eventName, socket_id })
+    const { channelName, data, eventName } = channelPusherDto
     const channel = await this.pusher.trigger(channelName, eventName, data)
 
     return ApiResponse({
@@ -49,11 +48,6 @@ export class PusherService {
    */
   private validateUserIdForChannel(channel: string, userId: string) {
     const isValid = channel.includes(`user-${userId}`)
-    console.log({
-      isValid,
-      channel,
-      userId,
-    })
 
     if (!isValid)
       throw new UnauthorizedException(
@@ -80,12 +74,6 @@ export class PusherService {
 
     // Saber qué tipo de canal es: presence, private o public
     const channelType = this.typeChannel(channel_name)
-    console.log({
-      channelType,
-      channel_name,
-      socket_id,
-      userId,
-    })
 
     // Validar solo si es private o presence
     // para el presence se necesita otro metodo
