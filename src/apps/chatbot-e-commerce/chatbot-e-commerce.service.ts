@@ -110,6 +110,9 @@ export class ChatbotECommerceService {
    */
   public async chatBotEcommmerce(chatbotSessionsDto: ChatbotSessionsDto) {
     const { question, sessionId, userId, channelMessage } = chatbotSessionsDto
+    console.log({
+      chatbotSessionsDto,
+    })
 
     this.logger.verbose(
       `Question "(${question})" | SessionId "(${sessionId})" | UserId "(${userId})"`,
