@@ -150,6 +150,7 @@ export class ChatbotECommerceService {
         },
         userId,
       })
+      console.log(chunk)
 
       fullReponse += chunk
     }
