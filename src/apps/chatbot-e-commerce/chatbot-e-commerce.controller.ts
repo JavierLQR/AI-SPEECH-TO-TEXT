@@ -34,6 +34,7 @@ export class ChatbotECommerceController {
   @HttpCode(HttpStatus.OK)
   @Post('chat-bot')
   chatBotEcommmerce(@Body() chatbotSessionsDto: ChatbotSessionsDto) {
+    console.log({ chatbotSessionsDto })
     return this.chatbotECommerceService.chatBotEcommmerce(chatbotSessionsDto)
   }
 
