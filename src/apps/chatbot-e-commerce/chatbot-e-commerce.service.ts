@@ -8,7 +8,6 @@ import { PrismaService } from 'nestjs-prisma'
 // My Modules
 import { MongoHistoryChatService } from 'src/modules/app-history/mongo-history-chat/mongo-history-chat.service'
 import { PineconeService } from 'src/modules/app-history/pinecone/pinecone.service'
-import { ChatHistoryUserEntity } from 'src/modules/chat-bot/entities/user-entity'
 import { ChatbotSessionsDto } from './dto/chatbot-sessions.dto'
 import { FilterFindHistoryService } from './filters/filters'
 import { PartialHistoryChat } from './interfaces/partial-history-chat.interface'
@@ -25,8 +24,8 @@ import { MongoDBChatMessageHistory } from '@langchain/mongodb'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { ApiResponse } from 'src/common/helpers/api.response'
-import { ChatMessage } from './entitie/chatbot-e-commerce.entity'
 import { PusherService } from '../pusher/pusher.service'
+import { ChatMessage } from './entitie/chatbot-e-commerce.entity'
 
 @Injectable()
 export class ChatbotECommerceService {
@@ -44,9 +43,6 @@ export class ChatbotECommerceService {
     private readonly mongoHistoryChatService: MongoHistoryChatService,
 
     private readonly pusherService: PusherService,
-
-    @InjectModel(ChatHistoryUserEntity.name)
-    private readonly modelChatHistoryUserEntity: Model<ChatHistoryUserEntity>,
 
     @InjectModel(ChatMessage.name)
     private readonly modelHistoryChat: Model<ChatMessage>,
@@ -147,6 +143,8 @@ export class ChatbotECommerceService {
         data: {
           message: chunk,
           userId,
+          sessionId: session_id,
+          userQuestion: question,
         },
         userId,
       })
