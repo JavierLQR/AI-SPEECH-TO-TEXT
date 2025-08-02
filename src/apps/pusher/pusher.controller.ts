@@ -13,7 +13,7 @@ export class PusherController {
   @Post('auth')
   authenticateUser(@Body() body: AuthPusherDto) {
     const user = {
-      userId: '1000',
+      userId: '1',
       name: 'Usuario Ejemplo',
       email: 'usuario@ejemplo.com',
     }
