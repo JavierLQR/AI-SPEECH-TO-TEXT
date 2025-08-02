@@ -24,6 +24,31 @@ class DataMessage {
   @IsString()
   @IsOptional()
   timestamp?: string | Date
+
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  sessionId: string
+
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  userQuestion: string
+
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  assistantResponse?: string
+
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  messageId?: string
+
+  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
+  _id?: string
 }
 
 export class SendMessagePusherDto {
