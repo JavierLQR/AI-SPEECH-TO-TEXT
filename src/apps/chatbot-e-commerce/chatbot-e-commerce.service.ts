@@ -66,7 +66,7 @@ export class ChatbotECommerceService {
       temperature: 0,
       maxRetries: 3,
       maxConcurrency: 2,
-      maxTokens: 300,
+      maxTokens: 500,
 
       onFailedAttempt: (error) => this.logger.error(error),
     })
