@@ -72,6 +72,7 @@ export class PusherService {
   public authorizeChannel(authPusherDto: AuthPusherDto, userId: string) {
     const { socket_id, channel_name } = authPusherDto
 
+    // Saber qué tipo de canal es: presence, private o public
     const channelType = this.typeChannel(channel_name)
 
     // Validar solo si es private o presence
