@@ -39,7 +39,6 @@ export class PusherService {
   }
 
   /**
-   * async validateUserIdForChannel
    * @param channel
    * @param userId
    * @return boolean
