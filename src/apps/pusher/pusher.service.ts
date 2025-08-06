@@ -46,12 +46,12 @@ export class PusherService {
    * @description Validates if the userId is allowed to access the channel
    * @throws Error if the userId is not allowed
    */
-  private validateUserIdForChannel(channel: string, userId: string) {
-    const isValid = channel.includes(`user-${userId}`)
+  private validateUserIdForChannel(channel: string, sessionId: string) {
+    const isValid = channel.includes(`user-${sessionId}`)
 
     if (!isValid)
       throw new UnauthorizedException(
-        `${userId} is not allowed to access this channel ${channel}`,
+        `${sessionId} is not allowed to access this channel ${channel}`,
       )
 
     return isValid
