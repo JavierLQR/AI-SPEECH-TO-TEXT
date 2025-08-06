@@ -47,6 +47,7 @@ export class PusherService {
    * @throws Error if the userId is not allowed
    */
   private validateUserIdForChannel(channel: string, sessionId: string) {
+    // user debe consistir con el chanal que se hay auth en el front end
     const isValid = channel.includes(`user-${sessionId}`)
 
     if (!isValid)
