@@ -51,7 +51,7 @@ export class PusherService {
 
     if (!isValid)
       throw new UnauthorizedException(
-        `${userId} is not allowed to access this channel`,
+        `${userId} is not allowed to access this channel ${channel}`,
       )
 
     return isValid
