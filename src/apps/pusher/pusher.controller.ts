@@ -16,8 +16,9 @@ export class PusherController {
       userId: '1',
       name: 'Usuario Ejemplo',
       email: 'usuario@ejemplo.com',
+      sessionId: '687b0fd0699333ee27bcef20',
     }
-    return this.pusherService.authorizeChannel(body, user.userId)
+    return this.pusherService.authorizeChannel(body, user.sessionId)
   }
 
   @Post('send-message')
