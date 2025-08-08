@@ -137,9 +137,6 @@ export class ChatbotECommerceService {
       const isString = typeof chunk === 'string'
       if (!isString) continue
       const { channelName, eventName, userId } = channelMessage
-      console.log({
-        chunk,
-      })
 
       await this.pusherService.trigger({
         channelName,
