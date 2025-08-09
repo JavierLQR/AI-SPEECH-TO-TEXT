@@ -30,6 +30,7 @@ import { ChatbotECommerceModule } from './apps/chatbot-e-commerce/chatbot-e-comm
 // import { PusherModule } from './pusher/pusher.module'
 import { PusherModule } from './apps/pusher/pusher.module'
 import { PushbulletModule } from './modules/pushbullet/pushbullet.module'
+import { OpenaiModule } from './openai/openai.module'
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { PushbulletModule } from './modules/pushbullet/pushbullet.module'
     ChatbotECommerceModule,
     PusherModule,
     PushbulletModule,
+    OpenaiModule,
   ],
   controllers: [],
 })
