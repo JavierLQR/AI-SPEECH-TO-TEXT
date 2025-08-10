@@ -119,7 +119,7 @@ export class ChatbotECommerceService {
     const chain = this.getChainWithMemory(session_id)
 
     const { context, retrievedProducts } =
-      await this.getSimilaritySearchWithScore(question, 3)
+      await this.getSimilaritySearchWithScore(question, 2)
 
     const response = await chain.stream(
       {
@@ -137,9 +137,6 @@ export class ChatbotECommerceService {
       const isString = typeof chunk === 'string'
       if (!isString) continue
       const { channelName, eventName, userId } = channelMessage
-      console.log({
-        chunk,
-      })
 
       await this.pusherService.trigger({
         channelName,
