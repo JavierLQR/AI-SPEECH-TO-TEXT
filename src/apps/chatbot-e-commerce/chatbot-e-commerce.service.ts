@@ -10,6 +10,9 @@ import { ChatbotSessionsDto } from './dto/chatbot-sessions.dto'
 import { FilterFindHistoryService } from './filters/filters'
 import { PartialHistoryChat } from './interfaces/partial-history-chat.interface'
 // import { HistoryChatMapper } from './mappers/history-chat.mapper'
+import { ApiResponse } from 'src/common/helpers/api.response'
+import { PusherService } from '../pusher/pusher.service'
+import { ChatMessage } from './entitie/chatbot-e-commerce.entity'
 import { mitralPrompt } from './prompt'
 
 // Modules Langchain
@@ -23,9 +26,6 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 
 // My Modules
-import { ApiResponse } from 'src/common/helpers/api.response'
-import { PusherService } from '../pusher/pusher.service'
-import { ChatMessage } from './entitie/chatbot-e-commerce.entity'
 
 @Injectable()
 export class ChatbotECommerceService {
