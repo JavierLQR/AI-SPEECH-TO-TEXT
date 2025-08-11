@@ -12,8 +12,8 @@ import { PartialHistoryChat } from './interfaces/partial-history-chat.interface'
 // import { HistoryChatMapper } from './mappers/history-chat.mapper'
 import { ApiResponse } from 'src/common/helpers/api.response'
 import { PusherService } from '../pusher/pusher.service'
-import { ChatMessage } from './entitie/chatbot-e-commerce.entity'
 import { mitralPrompt } from './prompt'
+import { ChatMessage } from './entitie/chatbot-e-commerce.entity'
 
 // Modules Langchain
 import { Document } from '@langchain/core/documents'
